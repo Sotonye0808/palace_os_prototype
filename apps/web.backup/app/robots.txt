@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and internal routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*.json$
+
+# Allow specific important paths
+Allow: /bukka/
+Allow: /palace/
+Allow: /account/
+Allow: /cart/
+Allow: /referral/
+
+# Sitemap location
+Sitemap: https://palaceos.com/sitemap.xml

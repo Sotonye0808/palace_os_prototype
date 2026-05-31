@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Tracking — FoliXx Bukka</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAF8; --surface: #FFFFFF; --fg: #1A1614; --muted: #7A706A;
+      --border: #E8E4DD; --primary: #E85D1A; --primary-light: #FFF5ED; --success: #2E7D52;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --xs:0.75rem;--sm:0.875rem;--base:1rem;--lg:1.125rem;--xl:1.25rem;--2xl:1.5rem;--3xl:1.875rem;
+      --radius-xl:1rem;--radius-full:9999px;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font: var(--base)/1.6 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    .navbar {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 40px; background:var(--surface); box-shadow:0 1px 6px rgba(0,0,0,0.04);
+    }
+    .navbar .logo-group { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .navbar .logo-icon { width:32px; height:32px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px; font-family:var(--font-display); }
+    .navbar .logo-text { font-family:var(--font-display); font-size:var(--lg); font-weight:700; color:var(--primary); }
+    .navbar .back { color:var(--muted); text-decoration:none; font-size:var(--sm); display:flex; align-items:center; gap:4px; }
+
+    .page { padding-top:80px; max-width:600px; margin:0 auto; padding-left:24px; padding-right:24px; padding-bottom:60px; }
+    .page-header { text-align:center; padding:32px 0; }
+    .page-header .order-id { font-family:var(--font-mono); font-size:var(--sm); color:var(--muted); }
+    .page-header h1 { font-family:var(--font-display); font-size:var(--3xl); margin-top:4px; }
+
+    .eta-card {
+      background: linear-gradient(135deg, var(--primary), #C44510);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+    .eta-card .label { font-size:var(--xs); text-transform:uppercase; letter-spacing:0.15em; opacity:0.8; }
+    .eta-card .time { font-size:3rem; font-weight:800; font-family:var(--font-display); line-height:1.2; margin:4px 0; }
+    .eta-card .sub { font-size:var(--sm); opacity:0.9; }
+
+    /* Status stepper */
+    .stepper { padding:24px 0; }
+    .step-item { display:flex; gap:16px; padding-bottom:24px; position:relative; }
+    .step-item:not(:last-child)::before {
+      content:''; position:absolute; left:15px; top:36px;
+      width:2px; height:calc(100% - 24px);
+      background: var(--border);
+    }
+    .step-item.completed:not(:last-child)::before { background: var(--primary); }
+    .step-item .dot {
+      width:32px; height:32px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; z-index:1;
+      background: var(--border); color: var(--muted);
+    }
+    .step-item.completed .dot { background: var(--success); color:#fff; }
+    .step-item.active .dot {
+      background: var(--primary); color:#fff;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(232,93,26,0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(232,93,26,0); }
+    }
+    .step-item .content { padding-top:4px; }
+    .step-item .content .title { font-weight:600; font-size:var(--sm); }
+    .step-item .content .time { color:var(--muted); font-size:var(--xs); }
+    .step-item.completed .content .title { color:var(--success); }
+    .step-item.active .content .title { color:var(--primary); }
+
+    .order-summary {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius-xl); padding:20px; margin-top:8px;
+    }
+    .order-summary .summary-header {
+      display:flex; justify-content:space-between; cursor:pointer;
+      font-size:var(--sm);
+    }
+    .order-summary .summary-header strong { color:var(--primary); }
+    .order-summary .items { margin-top:12px; }
+    .order-summary .item-row { display:flex; justify-content:space-between; font-size:var(--sm); padding:6px 0; color:var(--muted); }
+    .order-summary .item-row .qty { color:var(--muted); }
+    .order-summary .item-row .name { flex:1; padding-left:8px; }
+
+    .help-card {
+      background:var(--primary-light);
+      border-radius:var(--radius-xl); padding:20px; margin-top:16px;
+      text-align:center;
+    }
+    .help-card p { color:var(--muted); font-size:var(--sm); margin-bottom:8px; }
+    .help-card a { color:var(--primary); font-weight:600; text-decoration:none; }
+
+    .map-placeholder {
+      background: linear-gradient(135deg, #2A2420, #3D3733);
+      border-radius: var(--radius-xl);
+      height: 200px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(255,255,255,0.4);
+      font-size: var(--sm);
+      margin-bottom:24px;
+    }
+
+    @media (max-width: 768px) {
+      .navbar { padding:12px 20px; }
+      .page { padding-left:16px; padding-right:16px; }
+      .eta-card .time { font-size:2.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="bukka-home.html" class="logo-group">
+      <div class="logo-icon">B</div>
+      <div class="logo-text">FoliXx Bukka</div>
+    </a>
+    <a href="bukka-home.html" class="back">← Back</a>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="order-id">#BUK-20250527-0842</div>
+      <h1>Tracking Your <span style="color:var(--primary)">Order</span></h1>
+    </div>
+
+    <!-- Map placeholder -->
+    <div class="map-placeholder">
+      🗺️ Live Map — Your rider is on the way (demo)
+    </div>
+
+    <!-- ETA -->
+    <div class="eta-card">
+      <div class="label">Estimated Arrival</div>
+      <div class="time">12 min</div>
+      <div class="sub">Your order will arrive by 2:42 PM</div>
+    </div>
+
+    <!-- Status stepper -->
+    <div class="stepper">
+      <div class="step-item completed">
+        <div class="dot">✓</div>
+        <div class="content">
+          <div class="title">Order Placed</div>
+          <div class="time">2:05 PM</div>
+        </div>
+      </div>
+      <div class="step-item completed">
+        <div class="dot">✓</div>
+        <div class="content">
+          <div class="title">Order Confirmed</div>
+          <div class="time">2:07 PM</div>
+        </div>
+      </div>
+      <div class="step-item active">
+        <div class="dot">●</div>
+        <div class="content">
+          <div class="title">Preparing Your Meal</div>
+          <div class="time">Your jollof rice is being cooked fresh</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="dot">○</div>
+        <div class="content">
+          <div class="title">Out for Delivery</div>
+          <div class="time">Rider will pick up soon</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="dot">○</div>
+        <div class="content">
+          <div class="title">Delivered</div>
+          <div class="time">Enjoy your meal!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order summary accordion -->
+    <div class="order-summary">
+      <div class="summary-header" onclick="toggleSummary()">
+        <span>Order Summary</span>
+        <span><strong>3 items</strong> · <span style="color:var(--primary);font-weight:700;font-family:var(--font-mono)">₦9,950</span> <span id="summaryArrow" style="margin-left:8px">▼</span></span>
+      </div>
+      <div class="items" id="orderItems" style="display:none">
+        <div class="item-row"><span class="qty">2×</span><span class="name">Jollof Rice & Chicken</span><span>₦7,000</span></div>
+        <div class="item-row"><span class="qty">1×</span><span class="name">Suya Skewers (6pcs)</span><span>₦2,800</span></div>
+        <div class="item-row"><span class="qty">1×</span><span class="name">Zobo Lemonade</span><span>₦1,200</span></div>
+        <div class="item-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span></span><span style="font-weight:600;color:var(--fg)">Total</span><span style="color:var(--primary);font-weight:700;font-family:var(--font-mono)">₦9,950</span></div>
+      </div>
+    </div>
+
+    <!-- Help -->
+    <div class="help-card">
+      <p>Having an issue with your order?</p>
+      <a href="#">📱 Chat with us on WhatsApp →</a>
+    </div>
+  </div>
+
+  <script>
+    function toggleSummary() {
+      var items = document.getElementById('orderItems');
+      var arrow = document.getElementById('summaryArrow');
+      items.style.display = items.style.display === 'none' ? 'block' : 'none';
+      arrow.textContent = items.style.display === 'none' ? '▼' : '▲';
+    }
+  </script>
+</body>
+</html>

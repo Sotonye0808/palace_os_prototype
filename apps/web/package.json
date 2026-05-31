@@ -1,0 +1,35 @@
+{
+  "name": "palace-os-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest",
+    "analyze": "cross-env ANALYZE=true next build --webpack",
+    "analyze:server": "cross-env ANALYZE=true BUNDLE_ANALYZE=server next build --webpack",
+    "analyze:browser": "cross-env ANALYZE=true BUNDLE_ANALYZE=browser next build --webpack"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "zustand": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.3.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "@next/bundle-analyzer": "^16.0.0",
+    "vitest": "^0.30.0"
+  }
+}

@@ -1,0 +1,281 @@
+// Global CSS variables for Palace OS design system
+// This file defines the CSS custom properties (variables) for both brands
+// Brand-specific values are applied via data-brand attribute on :root
+
+/* ===== SEMANTIC ALIASES (Theme-Agnostic) ===== */
+/* These are the variables components actually use */
+/* They get set based on the brand context */
+
+:root {
+  /* Color System */
+  --color-primary: var(--bukka-primary-500); /* Will be overridden by brand context */
+  --color-primary-hover: var(--bukka-primary-600);
+  --color-secondary: var(--bukka-secondary-500);
+  --color-bg: var(--bukka-surface-bg);
+  --color-card: var(--bukka-surface-card);
+  --color-elevated: var(--bukka-surface-elevated);
+  --color-text: var(--bukka-text-primary);
+  --color-text-muted: var(--bukka-text-muted);
+  --color-border: var(--bukka-border-default);
+  --color-success: var(--bukka-success);
+  --color-error: var(--bukka-error);
+  --color-warning: var(--bukka-warning);
+  --color-info: var(--bukka-info);
+  
+  /* Typography */
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-base: 1rem;    /* 16px */
+  --text-lg: 1.125rem;  /* 18px */
+  --text-xl: 1.25rem;   /* 20px */
+  --text-2xl: 1.5rem;   /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem;  /* 36px */
+  --text-5xl: 3rem;     /* 48px */
+  --text-6xl: 3.75rem;  /* 60px */
+  --text-7xl: 4.5rem;   /* 72px */
+  
+  /* Font Weights */
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  
+  /* Line Heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+  
+  /* Letter Spacing */
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.1em;
+  --tracking-widest: 0.2em;
+  
+  /* Spacing System (4px base unit) */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+  --space-32: 8rem;     /* 128px */
+  
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem;  /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-xl: 1rem;    /* 16px */
+  --radius-2xl: 1.5rem; /* 24px */
+  --radius-3xl: 2rem;   /* 32px */
+  --radius-full: 9999px;
+  
+  /* Icon Sizes */
+  --icon-xs: 12px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+  --icon-2xl: 48px;
+  
+  /* Motion & Animation */
+  --duration-instant: 50ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+  
+  --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+  --ease-in: cubic-bezier(0.4, 0.0, 1.0, 1.0);
+  --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1.0);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1.0);
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Breakpoints */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
+  
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1440px;
+  --container-padding-x: clamp(1rem, 5vw, 4rem);
+}
+
+/* ===== FOLIXX BUKKA BRAND TOKENS ===== */
+:root[data-brand="folixx-bukka"] {
+  /* Primary */
+  --bukka-primary-50: #FFF5ED;
+  --bukka-primary-100: #FFE8D1;
+  --bukka-primary-200: #FFC99A;
+  --bukka-primary-300: #FFA563;
+  --bukka-primary-400: #FF7A2B;
+  --bukka-primary-500: #E85D1A;   /* Main CTA — Spiced Terracotta */
+  --bukka-primary-600: #C44510;
+  --bukka-primary-700: #9E2E08;
+  --bukka-primary-800: #7A1E04;
+  --bukka-primary-900: #5C1202;
+  
+  /* Secondary */
+  --bukka-secondary-500: #F5A623;  /* Warm Amber — accents, highlights */
+  --bukka-secondary-600: #D4881A;
+  
+  /* Neutral */
+  --bukka-neutral-0: #FFFFFF;
+  --bukka-neutral-50: #FAFAF8;
+  --bukka-neutral-100: #F4F2EE;
+  --bukka-neutral-200: #E8E4DD;
+  --bukka-neutral-300: #D4CECC;
+  --bukka-neutral-400: #A89F9A;
+  --bukka-neutral-500: #7A706A;
+  --bukka-neutral-600: #5A524D;
+  --bukka-neutral-700: #3D3733;
+  --bukka-neutral-800: #2A2420;
+  --bukka-neutral-900: #1A1614;
+  
+  /* Semantic */
+  --bukka-success: #2E7D52;
+  --bukka-warning: #F5A623;
+  --bukka-error: #C0392B;
+  --bukka-info: #2E5FA3;
+  
+  /* Surface */
+  --bukka-surface-bg: #FAFAF8;
+  --bukka-surface-card: #FFFFFF;
+  --bukka-surface-elevated: #FFFFFF;
+  --bukka-surface-overlay: rgba(26, 22, 20, 0.6);
+  
+  /* Text */
+  --bukka-text-primary: #1A1614;
+  --bukka-text-secondary: #5A524D;
+  --bukka-text-muted: #A89F9A;
+  --bukka-text-inverse: #FFFFFF;
+  --bukka-text-brand: #E85D1A;
+  
+  /* Border */
+  --bukka-border-default: #E8E4DD;
+  --bukka-border-strong: #D4CECC;
+  --bukka-border-brand: #E85D1A;
+  
+  /* Shadows */
+  --bukka-shadow-sm: 0 1px 3px rgba(232, 93, 26, 0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --bukka-shadow-md: 0 4px 12px rgba(232, 93, 26, 0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --bukka-shadow-lg: 0 10px 30px rgba(232, 93, 26, 0.12), 0 4px 8px rgba(0,0,0,0.08);
+  --bukka-shadow-xl: 0 20px 60px rgba(232, 93, 26, 0.15);
+  
+  /* Set semantic aliases to Bukka values */
+  --color-primary: var(--bukka-primary-500);
+  --color-primary-hover: var(--bukka-primary-600);
+  --color-secondary: var(--bukka-secondary-500);
+  --color-bg: var(--bukka-surface-bg);
+  --color-card: var(--bukka-surface-card);
+  --color-elevated: var(--bukka-surface-elevated);
+  --color-text: var(--bukka-text-primary);
+  --color-text-muted: var(--bukka-text-muted);
+  --color-border: var(--bukka-border-default);
+  --color-success: var(--bukka-success);
+  --color-error: var(--bukka-error);
+  --color-warning: var(--bukka-warning);
+  --color-info: var(--bukka-info);
+}
+
+/* ===== SECRETS PALACE BRAND TOKENS ===== */
+:root[data-brand="secrets-palace"] {
+  /* Primary — Royal Gold */
+  --palace-primary-50: #FFFBEB;
+  --palace-primary-100: #FEF3C7;
+  --palace-primary-200: #FDE68A;
+  --palace-primary-300: #FCD34D;
+  --palace-primary-400: #FBBF24;
+  --palace-primary-500: #D4A017;   /* Main CTA — 24K Gold */
+  --palace-primary-600: #B7880F;
+  --palace-primary-700: #92670A;
+  --palace-primary-800: #704D07;
+  --palace-primary-900: #523704;
+  
+  /* Secondary — Electric Violet */
+  --palace-secondary-500: #8B5CF6;   /* Accent — Nightclub energy */
+  --palace-secondary-400: #A78BFA;
+  --palace-secondary-600: #7C3AED;
+  
+  /* Dark Backgrounds */
+  --palace-dark-950: #080810;   /* Deepest background */
+  --palace-dark-900: #0E0E1A;   /* Page background */
+  --palace-dark-800: #14142A;   /* Card background */
+  --palace-dark-700: #1C1C38;   /* Elevated card */
+  --palace-dark-600: #252545;   /* Hover state */
+  --palace-dark-500: #2E2E55;   /* Active/Selected */
+  
+  /* Neutral — Cool Platinum */
+  --palace-neutral-50: #F8F8FC;
+  --palace-neutral-100: #EDEDF5;
+  --palace-neutral-200: #CDCDE0;
+  --palace-neutral-300: #ADADC8;
+  --palace-neutral-400: #8080A8;
+  --palace-neutral-500: #5F5F88;
+  --palace-neutral-600: #464669;
+  
+  /* Semantic */
+  --palace-success: #10B981;
+  --palace-warning: #D4A017;
+  --palace-error: #EF4444;
+  --palace-info: #8B5CF6;
+  
+  /* Surface */
+  --palace-surface-bg: #0E0E1A;
+  --palace-surface-card: #14142A;
+  --palace-surface-elevated: #1C1C38;
+  --palace-surface-overlay: rgba(8, 8, 16, 0.85);
+  --palace-surface-glass: rgba(20, 20, 42, 0.7); /* backdrop-filter blur */
+  
+  /* Text */
+  --palace-text-primary: #F0F0F8;
+  --palace-text-secondary: #ADADC8;
+  --palace-text-muted: #5F5F88;
+  --palace-text-inverse: #0E0E1A;
+  --palace-text-gold: #D4A017;
+  
+  /* Border */
+  --palace-border-default: rgba(173, 173, 200, 0.15);
+  --palace-border-gold: rgba(212, 160, 23, 0.5);
+  --palace-border-glow: rgba(212, 160, 23, 0.8);
+  
+  /* Shadows */
+  --palace-shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --palace-shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+  --palace-shadow-lg: 0 10px 40px rgba(0,0,0,0.6);
+  --palace-shadow-gold: 0 0 20px rgba(212, 160, 23, 0.3), 0 0 60px rgba(212, 160, 23, 0.15);
+  --palace-shadow-glow: 0 0 40px rgba(139, 92, 246, 0.4);
+  
+  /* Set semantic aliases to Palace values */
+  --color-primary: var(--palace-primary-500);
+  --color-primary-hover: var(--palace-primary-600);
+  --color-secondary: var(--palace-secondary-500);
+  --color-bg: var(--palace-surface-bg);
+  --color-card: var(--palace-surface-card);
+  --color-elevated: var(--palace-surface-elevated);
+  --color-text: var(--palace-text-primary);
+  --color-text-muted: var(--palace-text-muted);
+  --color-border: var(--palace-border-default);
+  --color-success: var(--palace-success);
+  --color-error: var(--palace-error);
+  --color-warning: var(--palace-warning);
+  --color-info: var(--palace-info);
+}

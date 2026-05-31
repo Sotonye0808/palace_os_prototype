@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoliXx Hospitality Group</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+    .brand-selector {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .brand-panel {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: flex 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .brand-panel:hover { flex: 1.4; }
+
+    .brand-panel .bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-panel:hover .bg { transform: scale(1.05); }
+
+    .brand-panel .overlay {
+      position: absolute;
+      inset: 0;
+      transition: opacity 0.4s;
+    }
+
+    .brand-panel .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 48px;
+    }
+
+    .brand-panel .logo {
+      font-weight: 700;
+      margin-bottom: 12px;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-panel:hover .logo { transform: scale(1.05); }
+
+    .brand-panel .tagline {
+      font-size: 1.25rem;
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+    }
+
+    .brand-panel:hover .tagline { opacity: 1; transform: translateY(0); }
+
+    .brand-panel .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 14px 32px;
+      border: 2px solid;
+      border-radius: 999px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-panel:hover .cta-btn {
+      transform: scale(1.06);
+    }
+
+    /* Bukka panel */
+    .bukka-panel .bg {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><rect fill="%23E85D1A" width="800" height="800"/><circle fill="%23F5A623" opacity="0.15" cx="200" cy="300" r="250"/><circle fill="%23FF7A2B" opacity="0.2" cx="600" cy="500" r="200"/><path fill="%23ffffff" opacity="0.05" d="M0 600 Q 200 500 400 650 T 800 600 L 800 800 L 0 800 Z"/></svg>');
+    }
+    .bukka-panel .overlay {
+      background: linear-gradient(135deg, rgba(232,93,26,0.85) 0%, rgba(26,22,20,0.6) 100%);
+    }
+    .bukka-panel .logo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 3rem;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    .bukka-panel .logo-sub {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .bukka-panel .tagline {
+      color: rgba(255,255,255,0.9);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+    }
+    .bukka-panel .cta-btn {
+      color: #fff;
+      border-color: rgba(255,255,255,0.6);
+    }
+    .bukka-panel:hover .cta-btn {
+      background: #fff;
+      color: #E85D1A;
+      border-color: #fff;
+    }
+
+    /* Palace panel */
+    .palace-panel .bg {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><rect fill="%23080810" width="800" height="800"/><circle fill="%23D4A017" opacity="0.08" cx="400" cy="350" r="300"/><circle fill="%238B5CF6" opacity="0.06" cx="200" cy="200" r="150"/><circle fill="%23D4A017" opacity="0.04" cx="600" cy="600" r="200"/><path fill="%23D4A017" opacity="0.03" d="M0 500 Q 200 600 400 550 T 800 500 L 800 800 L 0 800 Z"/></svg>');
+    }
+    .palace-panel .overlay {
+      background: linear-gradient(135deg, rgba(8,8,16,0.9) 0%, rgba(20,20,42,0.7) 100%);
+    }
+    .palace-panel .logo {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 3rem;
+      color: #D4A017;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .palace-panel .logo-sub {
+      font-size: 0.8rem;
+      color: rgba(212,160,23,0.6);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .palace-panel .tagline {
+      color: rgba(240,240,248,0.85);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+    }
+    .palace-panel .cta-btn {
+      color: #D4A017;
+      border-color: rgba(212,160,23,0.5);
+    }
+    .palace-panel:hover .cta-btn {
+      background: #D4A017;
+      color: #080810;
+      border-color: #D4A017;
+    }
+
+    /* Divider */
+    .divider {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .divider-line {
+      width: 1px;
+      height: 120px;
+      background: linear-gradient(to bottom, transparent, rgba(212,160,23,0.4), transparent);
+    }
+
+    .divider-logo {
+      width: 48px;
+      height: 48px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: #1A1614;
+      font-family: 'Playfair Display', Georgia, serif;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .brand-selector { flex-direction: column; }
+      .brand-panel { flex: 1; min-height: 50vh; }
+      .brand-panel:hover { flex: 1.6; }
+      .brand-panel .logo { font-size: 2rem; }
+      .brand-panel .tagline { font-size: 1rem; }
+      .divider {
+        flex-direction: row;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        gap: 0;
+      }
+      .divider-line {
+        width: 80px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(212,160,23,0.4), transparent);
+      }
+      .divider-logo {
+        width: 40px;
+        height: 40px;
+        font-size: 0.875rem;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-panel .content { padding: 24px; }
+      .brand-panel .logo { font-size: 1.6rem; }
+      .brand-panel .tagline { font-size: 0.875rem; margin-bottom: 20px; }
+      .brand-panel .cta-btn { font-size: 0.875rem; padding: 12px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-selector">
+    <div class="brand-panel bukka-panel" onclick="location.href='bukka-home.html'">
+      <div class="bg"></div>
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="logo-sub">FoliXx</div>
+        <div class="logo">Bukka</div>
+        <div class="tagline">"Taste the Tradition, Feel the Flavor"</div>
+        <button class="cta-btn" onclick="event.stopPropagation();location.href='bukka-home.html'">
+          Order Food →
+        </button>
+      </div>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-logo">F</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="brand-panel palace-panel" onclick="location.href='palace-home.html'">
+      <div class="bg"></div>
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="logo-sub">Secrets</div>
+        <div class="logo">Palace</div>
+        <div class="tagline">"Where Every Guest is Royalty"</div>
+        <button class="cta-btn" onclick="event.stopPropagation();location.href='palace-home.html'">
+          Book Your Night →
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

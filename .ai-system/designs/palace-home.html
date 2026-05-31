@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Secrets Palace — Where Every Guest is Royalty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(12% 0.005 260);
+      --surface: oklch(14% 0.008 260);
+      --elevated: oklch(16% 0.01 260);
+      --fg: oklch(95% 0.003 260);
+      --muted: oklch(45% 0.015 260);
+      --border: rgba(173, 173, 200, 0.12);
+      --gold: #D4A017;
+      --gold-light: #FBBF24;
+      --violet: #8B5CF6;
+      --glass: rgba(20, 20, 42, 0.7);
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-accent: 'Cinzel', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --xs: 0.75rem;
+      --sm: 0.875rem;
+      --base: 1rem;
+      --lg: 1.125rem;
+      --xl: 1.25rem;
+      --2xl: 1.5rem;
+      --3xl: 1.875rem;
+      --4xl: 2.25rem;
+      --5xl: 3rem;
+      --6xl: 3.75rem;
+      --7xl: 4.5rem;
+      --8xl: 5.5rem;
+
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+      --space-20: 5rem;
+      --space-24: 6rem;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font: var(--base)/1.6 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+    .navbar.scrolled {
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .navbar .crest {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--gold);
+    }
+    .navbar .wordmark {
+      font-family: var(--font-display);
+      font-size: var(--xl);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+    }
+    .navbar .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .navbar .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: var(--sm);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .navbar .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.3s;
+    }
+    .navbar .nav-links a:hover { color: var(--fg); }
+    .navbar .nav-links a:hover::after { width: 100%; }
+    .navbar .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      color: var(--gold);
+      font-size: var(--sm);
+      font-weight: 600;
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.3s;
+    }
+    .navbar .nav-cta:hover {
+      background: var(--gold);
+      color: var(--bg);
+    }
+    .navbar .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .navbar .hamburger span { width: 24px; height: 2px; background: var(--gold); border-radius: 1px; transition: all 0.3s; }
+
+    /* Mobile nav overlay */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(8,8,16,0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .mobile-nav.open { display: flex; opacity: 1; }
+    .mobile-nav a {
+      color: var(--fg);
+      font-family: var(--font-display);
+      font-size: var(--4xl);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .mobile-nav a:hover { color: var(--gold); }
+    .mobile-nav .close-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 32px;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero .bg-canvas {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 40%, rgba(212,160,23,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(139,92,246,0.05) 0%, transparent 50%),
+                  linear-gradient(180deg, var(--bg) 0%, oklch(10% 0.006 260) 50%, var(--bg) 100%);
+    }
+    .hero .bg-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .hero .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle 4s infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.6; }
+    }
+    .hero .overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 30%, rgba(8,8,16,0.85) 100%);
+    }
+    .hero .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 800px;
+      padding: 24px;
+    }
+    .hero .crest-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border: 1px solid rgba(212,160,23,0.4);
+      border-radius: 50%;
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: var(--gold);
+      animation: fadeUp 1s ease both;
+    }
+    .hero .eyebrow {
+      font-family: var(--font-accent);
+      font-size: var(--xs);
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      animation: fadeUp 1s ease 0.15s both;
+    }
+    .hero .heading {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, var(--8xl));
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--fg);
+      margin-bottom: 20px;
+      animation: fadeUp 1s ease 0.3s both;
+    }
+    .hero .heading .gold { color: var(--gold); }
+    .hero .subtext {
+      font-size: clamp(1rem, 1.5vw, var(--lg));
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+      animation: fadeUp 1s ease 0.45s both;
+    }
+    .hero .ctas {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 1s ease 0.6s both;
+    }
+    .hero .cta-primary, .hero .cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      font-size: var(--sm);
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.3s;
+    }
+    .hero .cta-primary {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+    }
+    .hero .cta-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .hero .cta-secondary {
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid rgba(212,160,23,0.4);
+    }
+    .hero .cta-secondary:hover { border-color: var(--gold); background: rgba(212,160,23,0.08); }
+    .hero .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: var(--xs);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: fadeUp 1s ease 0.8s both;
+    }
+    .hero .scroll-hint .chevron {
+      animation: chevronBounce 2s infinite;
+      color: var(--gold);
+    }
+    @keyframes chevronBounce {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(8px); opacity: 0.4; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Operating hours banner */
+    .hours-banner {
+      background: linear-gradient(90deg, var(--surface), oklch(16% 0.02 260), var(--surface));
+      border-top: 1px solid rgba(212,160,23,0.1);
+      border-bottom: 1px solid rgba(212,160,23,0.1);
+      padding: 14px 0;
+      overflow: hidden;
+    }
+    .hours-banner .marquee {
+      display: flex;
+      gap: 48px;
+      animation: scrollBanner 30s linear infinite;
+      width: max-content;
+    }
+    .hours-banner .marquee span {
+      font-size: var(--sm);
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+    .hours-banner .marquee .highlight { color: var(--gold); }
+    @keyframes scrollBanner {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Sections */
+    .section {
+      padding: var(--space-24) var(--space-8);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-family: var(--font-accent);
+      font-size: var(--xs);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(var(--3xl), 4vw, var(--5xl));
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: var(--space-6);
+    }
+    .section-sub {
+      color: var(--muted);
+      max-width: 560px;
+      font-size: var(--lg);
+      line-height: 1.7;
+    }
+
+    /* Events grid */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: var(--space-10);
+    }
+    .event-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .event-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 40px rgba(212,160,23,0.15), 0 0 80px rgba(212,160,23,0.05);
+      border-color: rgba(212,160,23,0.2);
+    }
+    .event-card .poster {
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .event-card .poster .gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, oklch(18% 0.02 260), oklch(14% 0.03 280));
+    }
+    .event-card .poster .gradient::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(212,160,23,0.1), transparent 70%);
+    }
+    .event-card .poster .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .event-card .poster .badge.tonight { background: var(--gold); color: var(--bg); }
+    .event-card .poster .badge.upcoming { background: rgba(139,92,246,0.2); color: var(--violet); border: 1px solid rgba(139,92,246,0.3); }
+    .event-card .poster .card-icon { font-size: 48px; color: var(--gold); opacity: 0.3; z-index: 1; }
+    .event-card .body { padding: 20px; }
+    .event-card .date { font-size: var(--sm); color: var(--muted); margin-bottom: 4px; }
+    .event-card .event-name {
+      font-family: var(--font-display);
+      font-size: var(--xl);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .event-card .performer { color: var(--gold); font-size: var(--sm); margin-bottom: 12px; }
+    .event-card .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--sm);
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .event-card .event-cta {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--gold);
+      font-size: var(--sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .event-card .event-cta:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+    .view-all-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: var(--sm);
+      margin-top: var(--space-8);
+      transition: gap 0.3s;
+    }
+    .view-all-link:hover { gap: 14px; }
+
+    /* Reservation teaser */
+    .reserve-teaser {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      align-items: center;
+      background: linear-gradient(135deg, var(--surface), oklch(15% 0.015 260));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: var(--space-12);
+      margin-top: var(--space-8);
+    }
+    .reserve-teaser .map-preview {
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, oklch(18% 0.02 260), var(--bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reserve-teaser .map-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .reserve-teaser .map-preview .map-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 16px;
+    }
+    .reserve-teaser .map-preview .map-grid .table-spot {
+      border: 1px solid rgba(212,160,23,0.15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: rgba(240,240,248,0.3);
+    }
+    .reserve-teaser .map-preview .map-grid .table-spot.available { border-color: rgba(212,160,23,0.3); }
+    .reserve-teaser .map-preview .map-grid .table-spot.vip { border-color: rgba(139,92,246,0.3); }
+    .reserve-teaser .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-top: 24px;
+      transition: all 0.3s;
+    }
+    .reserve-teaser .cta:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    /* Experience pillars */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: var(--space-10);
+    }
+    .pillar-card {
+      text-align: center;
+      padding: var(--space-10) var(--space-6);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.4s;
+    }
+    .pillar-card:hover {
+      border-color: rgba(212,160,23,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .pillar-card .icon { font-size: 36px; margin-bottom: 16px; color: var(--gold); }
+    .pillar-card h3 { font-family: var(--font-display); font-size: var(--xl); margin-bottom: 8px; color: var(--fg); }
+    .pillar-card p { color: var(--muted); font-size: var(--sm); line-height: 1.6; }
+
+    /* Quote */
+    .quote-section {
+      text-align: center;
+      padding: var(--space-24) var(--space-8);
+      background: linear-gradient(180deg, var(--bg), var(--surface), var(--bg));
+    }
+    .quote-section blockquote {
+      font-family: var(--font-display);
+      font-size: clamp(var(--2xl), 3vw, var(--4xl));
+      font-style: italic;
+      color: var(--gold);
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+    .quote-section .attribution {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: var(--sm);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: var(--space-10);
+    }
+    .testimonial-card {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: var(--space-6);
+    }
+    .testimonial-card .stars { color: var(--gold); font-size: var(--lg); margin-bottom: 12px; letter-spacing: 2px; }
+    .testimonial-card .quote {
+      color: var(--muted);
+      font-size: var(--sm);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .testimonial-card .author {
+      font-size: var(--sm);
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    /* Footer */
+    .footer {
+      background: oklch(7% 0.004 260);
+      border-top: 1px solid rgba(212,160,23,0.15);
+      padding: var(--space-16) var(--space-8) var(--space-8);
+    }
+    .footer-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: var(--space-10);
+    }
+    .footer h4 {
+      font-family: var(--font-display);
+      font-size: var(--lg);
+      color: var(--gold);
+      margin-bottom: var(--space-4);
+    }
+    .footer p, .footer a {
+      color: var(--muted);
+      font-size: var(--sm);
+      line-height: 2;
+      text-decoration: none;
+      display: block;
+      transition: color 0.2s;
+    }
+    .footer a:hover { color: var(--gold); }
+    .footer .social-row { display: flex; gap: 12px; margin-top: var(--space-4); }
+    .footer .social-row a {
+      width: 40px; height: 40px;
+      border: 1px solid rgba(212,160,23,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--sm);
+      transition: all 0.3s;
+    }
+    .footer .social-row a:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,160,23,0.1); }
+    .footer .bottom {
+      max-width: 1280px;
+      margin: var(--space-10) auto 0;
+      padding-top: var(--space-6);
+      border-top: 1px solid rgba(173,173,200,0.08);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      font-size: var(--xs);
+      color: var(--muted);
+    }
+    .footer .bottom a {
+      display: inline;
+      font-size: var(--xs);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .events-grid { grid-template-columns: repeat(2, 1fr); }
+      .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+      .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .navbar { padding: 12px 20px; }
+      .navbar .nav-links, .navbar .nav-cta { display: none; }
+      .navbar .hamburger { display: flex; }
+      .section { padding: var(--space-16) var(--space-6); }
+      .events-grid { grid-template-columns: 1fr; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .reserve-teaser { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero .heading { font-size: var(--6xl); }
+    }
+    @media (max-width: 480px) {
+      .hero .heading { font-size: var(--4xl); }
+      .section-title { font-size: var(--2xl); }
+      .reserve-teaser { padding: var(--space-6); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mobile nav overlay -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="close-btn" onclick="closeMobileNav()">✕</button>
+    <a href="palace-home.html" onclick="closeMobileNav()">Home</a>
+    <a href="palace-events.html" onclick="closeMobileNav()">Events</a>
+    <a href="palace-reserve.html" onclick="closeMobileNav()">Reserve</a>
+    <a href="account-hub.html" onclick="closeMobileNav()">Account</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="brand-group" style="text-decoration:none">
+      <div class="crest">♛</div>
+      <div class="wordmark">SECRETS PALACE</div>
+    </a>
+    <div class="nav-links">
+      <a href="palace-home.html" style="color:var(--gold)">Home</a>
+      <a href="palace-events.html">Events</a>
+      <a href="palace-reserve.html">Reserve</a>
+      <a href="account-hub.html">Account</a>
+    </div>
+    <a href="palace-reserve.html" class="nav-cta">Book Now</a>
+    <button class="hamburger" onclick="openMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="bg-canvas"></div>
+    <div class="bg-particles" id="particles"></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="crest-icon">♛</div>
+      <div class="eyebrow">Lekki · Lagos · Est. 2022</div>
+      <h1 class="heading">Where Every Guest<br><span class="gold">Is Royalty</span></h1>
+      <p class="subtext">Lagos's most luxurious nightlife destination. Open Wednesday to Sunday, 10PM–6AM. Where world-class entertainment meets premium bottle service.</p>
+      <div class="ctas">
+        <a href="palace-reserve.html" class="cta-primary">Reserve Your Table →</a>
+        <a href="palace-events.html" class="cta-secondary">See Events</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <span class="chevron">⌄</span>
+    </div>
+  </section>
+
+  <!-- Hours banner -->
+  <div class="hours-banner">
+    <div class="marquee">
+      <span>✦ <span class="highlight">OPEN:</span> Wednesday – Sunday · 10PM – 6AM · 148 Lekki-Epe Expressway, Lekki</span>
+      <span>✦ <span class="highlight">DRESS CODE:</span> Smart Elegance · No Slippers · No Caps</span>
+      <span>✦ <span class="highlight">BOTTLE SERVICE:</span> Premium Packages Available · Reserve Your Table</span>
+      <span>✦ <span class="highlight">OPEN:</span> Wednesday – Sunday · 10PM – 6AM · 148 Lekki-Epe Expressway, Lekki</span>
+      <span>✦ <span class="highlight">DRESS CODE:</span> Smart Elegance · No Slippers · No Caps</span>
+      <span>✦ <span class="highlight">BOTTLE SERVICE:</span> Premium Packages Available · Reserve Your Table</span>
+    </div>
+  </div>
+
+  <!-- Events section -->
+  <div class="section" id="events">
+    <div class="section-label">This Week</div>
+    <h2 class="section-title">This Week at <span style="color:var(--gold)">Secrets</span></h2>
+    <p class="section-sub">Every night is a curated masterpiece. From Afrobeats Fridays to Sunday Soiree.</p>
+
+    <div class="events-grid">
+      <div class="event-card" onclick="location.href='palace-event-detail.html'">
+        <div class="poster">
+          <div class="gradient"></div>
+          <div class="badge tonight">Tonight</div>
+          <div class="card-icon">♪</div>
+        </div>
+        <div class="body">
+          <div class="date">Fri, 30 May · 11PM</div>
+          <div class="event-name">AFROBEATS FRIDAY</div>
+          <div class="performer">ft. DJ Spinall</div>
+          <div class="pricing-row">
+            <span>General: ₦15,000</span>
+            <span>VIP: ₦35,000</span>
+          </div>
+          <a href="palace-event-detail.html" class="event-cta">Get Tickets</a>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="poster">
+          <div class="gradient" style="background:linear-gradient(135deg, oklch(20% 0.03 280), oklch(14% 0.04 300))"></div>
+          <div class="badge upcoming">Upcoming</div>
+          <div class="card-icon">✦</div>
+        </div>
+        <div class="body">
+          <div class="date">Sat, 31 May · 10PM</div>
+          <div class="event-name">LADIES NIGHT</div>
+          <div class="performer">Live Performance</div>
+          <div class="pricing-row">
+            <span>General: ₦10,000</span>
+            <span>VIP: ₦25,000</span>
+          </div>
+          <a href="palace-event-detail.html" class="event-cta">Get Tickets</a>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="poster">
+          <div class="gradient" style="background:linear-gradient(135deg, oklch(18% 0.015 240), oklch(14% 0.02 250))"></div>
+          <div class="badge upcoming">Upcoming</div>
+          <div class="card-icon">☾</div>
+        </div>
+        <div class="body">
+          <div class="date">Sun, 1 Jun · 9PM</div>
+          <div class="event-name">SUNDAY SOIREE</div>
+          <div class="performer">DJ Cuppy</div>
+          <div class="pricing-row">
+            <span>General: ₦12,000</span>
+            <span>VIP: ₦30,000</span>
+          </div>
+          <a href="palace-event-detail.html" class="event-cta">Get Tickets</a>
+        </div>
+      </div>
+    </div>
+
+    <a href="palace-events.html" class="view-all-link">View All Events →</a>
+  </div>
+
+  <!-- Reservation teaser -->
+  <div class="section">
+    <div class="reserve-teaser">
+      <div>
+        <div class="section-label">Reservations</div>
+        <h2 class="section-title" style="font-size:var(--4xl)">Secure <span style="color:var(--gold)">Your Throne</span></h2>
+        <p style="color:var(--muted); font-size:var(--lg); line-height:1.7; margin-bottom:16px;">
+          Choose your experience: Standard Table, VIP Package, or the exclusive VVIP Suite with premium bottle service and dedicated host.
+        </p>
+        <a href="palace-reserve.html" class="cta">Reserve a Table →</a>
+      </div>
+      <div class="map-preview">
+        <div class="map-grid">
+          <div class="table-spot available">T1</div><div class="table-spot available">T2</div><div class="table-spot">T3</div><div class="table-spot vip">V1</div>
+          <div class="table-spot">T4</div><div class="table-spot available">T5</div><div class="table-spot vip">V2</div><div class="table-spot">T6</div>
+          <div class="table-spot available">T7</div><div class="table-spot">T8</div><div class="table-spot vip">V3</div><div class="table-spot">T9</div>
+          <div class="table-spot">T10</div><div class="table-spot available">T11</div><div class="table-spot">T12</div><div class="table-spot vip">VVIP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote section -->
+  <div class="quote-section">
+    <blockquote>"At Secrets Palace, we don't just host nightlife — we define it."</blockquote>
+    <div class="attribution">— The House of Secrets</div>
+  </div>
+
+  <!-- Experience pillars -->
+  <div class="section">
+    <div class="section-label">The Experience</div>
+    <h2 class="section-title">Built for <span style="color:var(--gold)">Royalty</span></h2>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="icon">♛</div>
+        <h3>Royal Treatment</h3>
+        <p>Personalized service from the moment you arrive. Dedicated hosts, priority entry, and a staff-to-guest ratio that ensures every need is met before you ask.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="icon">♪</div>
+        <h3>World-Class Entertainment</h3>
+        <p>International DJs, live performances, and curated music experiences that set the standard for Lagos nightlife. Every night is a different journey.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="icon">✦</div>
+        <h3>Premium Bottle Service</h3>
+        <p>Champagne, premium spirits, and expertly crafted cocktails served with theatrical flair. Our collection spans the world's finest labels.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="section">
+    <div class="section-label">Testimonials</div>
+    <h2 class="section-title">What Our <span style="color:var(--gold)">Guests Say</span></h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <div class="quote">"The most incredible nightlife experience in Lagos. From the decor to the service, everything is world-class. The VVIP section is unmatched."</div>
+        <div class="author">— Adewale</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <div class="quote">"I've been to clubs in London, Dubai, and Lagos — Secrets Palace is on another level. The gold aesthetic, the energy, the crowd. Perfection."</div>
+        <div class="author">— Chioma</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <div class="quote">"Booked the VIP package for my birthday and it was unforgettable. The bottle presentation, the dedicated server, the view of the main floor — incredible."</div>
+        <div class="author">— Tunde</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <h4>Secrets Palace</h4>
+        <p style="line-height:1.7">Lagos's most luxurious nightlife destination. Where every guest is royalty. Wednesday to Sunday, 10PM–6AM.</p>
+        <div class="social-row">
+          <a href="#">IG</a>
+          <a href="#">WA</a>
+          <a href="#">TA</a>
+          <a href="#">TT</a>
+        </div>
+      </div>
+      <div>
+        <h4>Navigate</h4>
+        <a href="palace-events.html">Events</a>
+        <a href="palace-reserve.html">Reserve a Table</a>
+        <a href="palace-home.html">Home</a>
+        <a href="account-hub.html">My Account</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>148 Lekki-Epe Expressway</p>
+        <p>Lekki Phase 1, Lagos</p>
+        <p>+234 800 SECRETS</p>
+        <p>info@secrets-palace.com</p>
+      </div>
+      <div>
+        <h4>Dress Code</h4>
+        <p>Smart Elegance Required</p>
+        <p>No slippers • No caps</p>
+        <p>Management reserves right</p>
+        <p>of admission</p>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2025 Secrets Palace · FoliXx Hospitality Group</span>
+      <div style="display:flex;gap:16px">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Particles
+    (function() {
+      var container = document.getElementById('particles');
+      for (var i = 0; i < 50; i++) {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.top = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 4 + 's';
+        p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+        container.appendChild(p);
+      }
+    })();
+
+    // Navbar scroll
+    var navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', function() {
+      navbar.classList.toggle('scrolled', window.scrollY > 80);
+    });
+
+    // Mobile nav
+    function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+    function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+  </script>
+</body>
+</html>

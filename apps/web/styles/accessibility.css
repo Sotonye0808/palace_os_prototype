@@ -1,0 +1,70 @@
+/* Accessibility fixes for WCAG 2.1 AA compliance */
+
+/* Skip link styling */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: 8px 16px;
+  z-index: 1000;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Enhanced focus indicators for interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Ensure sufficient color contrast for text */
+.text-text-muted {
+  color: var(--color-text-muted) !important;
+}
+
+/* Ensure form labels are properly associated */
+label {
+  cursor: pointer;
+}
+
+/* Ensure adequate touch target size (44x44px minimum) */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Ensure focus states are visible in high contrast modes */
+@media (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid WindowText;
+    outline-offset: 2px;
+  }
+}
+
+/* Ensure animations respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

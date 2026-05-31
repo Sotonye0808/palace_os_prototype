@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Account — FoliXx Hospitality</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAF8; --surface: #FFFFFF; --fg: #1A1614; --muted: #7A706A;
+      --border: #E8E4DD; --primary: #E85D1A;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --xs:0.75rem;--sm:0.875rem;--base:1rem;--lg:1.125rem;--xl:1.25rem;
+      --2xl:1.5rem;--3xl:1.875rem;--4xl:2.25rem;
+      --space-4:1rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+      --radius-xl:1rem;--radius-full:9999px;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font: var(--base)/1.6 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    body.palace-mode {
+      --bg: oklch(12% 0.005 260); --surface: oklch(14% 0.008 260); --fg: oklch(95% 0.003 260);
+      --muted: oklch(45% 0.015 260); --border: rgba(173,173,200,0.12); --primary: #D4A017;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .brand-toggle {
+      position:fixed; top:12px; right:16px; z-index:101;
+      display:flex; gap:4px; background:var(--surface); padding:3px;
+      border-radius:var(--radius-full); border:1px solid var(--border);
+    }
+    .brand-toggle button {
+      padding:6px 14px; border:none; border-radius:var(--radius-full);
+      font-size:10px; font-weight:600; cursor:pointer;
+      background:transparent; color:var(--muted); transition:all 0.2s;
+      font-family:var(--font-body);
+    }
+    .brand-toggle button.active { background:var(--primary); color:#fff; }
+
+    .page { display:flex; padding-top:0; min-height:100vh; }
+    .sidebar-nav {
+      width:240px; flex-shrink:0;
+      padding: 80px 16px 24px;
+      border-right: 1px solid var(--border);
+      position:sticky; top:0; height:100vh; overflow-y:auto;
+    }
+    .sidebar-nav .user-card {
+      text-align:center; padding:16px 0; margin-bottom:16px;
+      border-bottom:1px solid var(--border);
+    }
+    .sidebar-nav .avatar {
+      width:64px; height:64px; margin:0 auto 8px;
+      background:var(--primary); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:28px; font-weight:700; font-family:var(--font-display);
+    }
+    .sidebar-nav .name { font-weight:600; }
+    .sidebar-nav .email { font-size:var(--xs); color:var(--muted); }
+
+    .sidebar-nav .nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:10px;
+      color:var(--muted); text-decoration:none; font-size:var(--sm); font-weight:500;
+      transition:all 0.2s; margin-bottom:2px;
+    }
+    .sidebar-nav .nav-item:hover { background:var(--border); color:var(--fg); }
+    .sidebar-nav .nav-item.active { background:rgba(232,93,26,0.08); color:var(--primary); }
+    body.palace-mode .sidebar-nav .nav-item.active { background:rgba(212,160,23,0.08); }
+    .sidebar-nav .nav-item .icon { font-size:18px; width:24px; text-align:center; }
+
+    .main-area { flex:1; padding:80px 32px 60px; max-width:calc(100% - 240px); }
+    .main-area h1 { font-family:var(--font-display); font-size:var(--3xl); margin-bottom:4px; }
+    .main-area .greeting { color:var(--muted); margin-bottom:24px; }
+
+    /* Loyalty tier card */
+    .tier-card {
+      background: linear-gradient(135deg, var(--primary), #C44510);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap; gap:16px;
+    }
+    body.palace-mode .tier-card { background: linear-gradient(135deg, #D4A017, #B7880F); }
+    .tier-card .left { display:flex; align-items:center; gap:16px; }
+    .tier-card .badge {
+      font-size:40px;
+    }
+    .tier-card .tier-name { font-family:var(--font-display); font-size:var(--xl); font-weight:700; }
+    .tier-card .tier-sub { font-size:var(--xs); opacity:0.8; }
+    .tier-card .points { text-align:right; }
+    .tier-card .points .num { font-size:2rem; font-weight:800; font-family:var(--font-display); }
+    .tier-card .points .lbl { font-size:var(--xs); opacity:0.8; }
+
+    .progress-bar {
+      width:100%; height:6px; background:rgba(255,255,255,0.2); border-radius:3px;
+      margin-top:12px; overflow:hidden;
+    }
+    .progress-bar .fill {
+      height:100%; background:#fff; border-radius:3px;
+      width:68%; transition:width 0.6s;
+    }
+
+    /* Activity tabs */
+    .activity-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:16px; }
+    .activity-tabs button {
+      padding:10px 20px; border:none; background:transparent;
+      font-size:var(--sm); font-weight:500; color:var(--muted);
+      cursor:pointer; position:relative; font-family:var(--font-body);
+    }
+    .activity-tabs button.active { color:var(--primary); }
+    .activity-tabs button.active::after {
+      content:''; position:absolute; bottom:-1px; left:0; right:0;
+      height:2px; background:var(--primary);
+    }
+
+    .activity-list { display:flex; flex-direction:column; gap:8px; }
+    .activity-item {
+      display:flex; align-items:center; gap:12px;
+      padding:12px; background:var(--surface);
+      border:1px solid var(--border); border-radius:10px;
+    }
+    .activity-item .a-icon {
+      width:40px; height:40px; border-radius:10px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-size:20px;
+    }
+    .activity-item .a-icon.bukka { background:var(--primary-light); }
+    body.palace-mode .activity-item .a-icon.bukka { background:rgba(212,160,23,0.08); }
+    .activity-item .a-icon.palace { background:rgba(139,92,246,0.08); }
+    .activity-item .a-detail { flex:1; }
+    .activity-item .a-detail .a-title { font-weight:500; font-size:var(--sm); }
+    .activity-item .a-detail .a-time { font-size:var(--xs); color:var(--muted); }
+    .activity-item .a-action { font-size:var(--xs); color:var(--primary); font-weight:600; text-decoration:none; }
+    .activity-item .a-action:hover { text-decoration:underline; }
+
+    /* Quick actions */
+    .quick-actions { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:24px; }
+    .quick-card {
+      padding:20px; border:1px solid var(--border);
+      border-radius:var(--radius-xl); background:var(--surface);
+      cursor:pointer; transition:all 0.3s; text-decoration:none; color:inherit;
+    }
+    .quick-card:hover { border-color:var(--primary); transform:translateY(-2px); }
+    body.palace-mode .quick-card:hover { border-color:var(--primary); }
+    .quick-card .q-icon { font-size:28px; margin-bottom:8px; }
+    .quick-card .q-title { font-weight:600; font-size:var(--sm); }
+    .quick-card .q-desc { color:var(--muted); font-size:var(--xs); }
+
+    /* Bottom tabs mobile */
+    .bottom-tabs { display:none; position:fixed; bottom:0; left:0; right:0;
+      background:var(--surface); border-top:1px solid var(--border);
+      z-index:100; padding:8px 0; }
+    .bottom-tabs a {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      gap:2px; text-decoration:none; color:var(--muted); font-size:9px;
+      padding:4px 0;
+    }
+    .bottom-tabs a .icon { font-size:20px; }
+    .bottom-tabs a.active { color:var(--primary); }
+
+    @media (max-width: 768px) {
+      .sidebar-nav { display:none; }
+      .main-area { max-width:100%; padding:72px 16px 80px; }
+      .bottom-tabs { display:flex; }
+      .quick-actions { grid-template-columns:1fr; }
+      .tier-card { flex-direction:column; text-align:center; }
+      .tier-card .points { text-align:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-toggle">
+    <button class="active" onclick="switchBrand('bukka',this)">Bukka</button>
+    <button onclick="switchBrand('palace',this)">Palace</button>
+  </div>
+
+  <div class="page">
+    <!-- Desktop sidebar -->
+    <aside class="sidebar-nav">
+      <div class="user-card">
+        <div class="avatar">C</div>
+        <div class="name">Chioma Okafor</div>
+        <div class="email">chioma@example.com</div>
+      </div>
+      <a href="account-hub.html" class="nav-item active">
+        <span class="icon">📊</span> Overview
+      </a>
+      <a href="#" class="nav-item" onclick="alert('Orders page (coming soon)')">
+        <span class="icon">📋</span> My Orders
+      </a>
+      <a href="#" class="nav-item" onclick="alert('Bookings page (coming soon)')">
+        <span class="icon">📅</span> My Bookings
+      </a>
+      <a href="account-loyalty.html" class="nav-item">
+        <span class="icon">⭐</span> Loyalty & Rewards
+      </a>
+      <a href="account-profile.html" class="nav-item">
+        <span class="icon">👤</span> Profile Settings
+      </a>
+      <a href="#" class="nav-item" onclick="alert('Notifications (coming soon)')">
+        <span class="icon">🔔</span> Notifications
+      </a>
+      <div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--border)">
+        <a href="index.html" class="nav-item">
+          <span class="icon">↩</span> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-area">
+      <h1>Welcome back, <span style="color:var(--primary)">Chioma</span></h1>
+      <p class="greeting">Here's what's happening with your account</p>
+
+      <!-- Loyalty tier -->
+      <div class="tier-card">
+        <div class="left">
+          <div class="badge">⭐</div>
+          <div>
+            <div class="tier-name">Gold Member</div>
+            <div class="tier-sub">1,250 points to Royal tier</div>
+            <div class="progress-bar"><div class="fill"></div></div>
+          </div>
+        </div>
+        <div class="points">
+          <div class="num">3,750</div>
+          <div class="lbl">Points Balance</div>
+        </div>
+      </div>
+
+      <!-- Activity tabs -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <h2 style="font-family:var(--font-display);font-size:var(--xl)">Recent Activity</h2>
+        <a href="#" style="color:var(--primary);font-size:var(--xs);font-weight:600;text-decoration:none">View All</a>
+      </div>
+      <div class="activity-tabs">
+        <button class="active" onclick="switchActivity('all',this)">All</button>
+        <button onclick="switchActivity('orders',this)">Orders</button>
+        <button onclick="switchActivity('bookings',this)">Bookings</button>
+      </div>
+
+      <div class="activity-list">
+        <div class="activity-item" data-type="orders">
+          <div class="a-icon bukka">🍛</div>
+          <div class="a-detail">
+            <div class="a-title">Jollof Rice & Chicken delivered</div>
+            <div class="a-time">Today, 2:30 PM · FoliXx Bukka</div>
+          </div>
+          <a href="#" class="a-action" onclick="alert('Reorder (demo)')">Reorder</a>
+        </div>
+        <div class="activity-item" data-type="orders">
+          <div class="a-icon bukka">🥟</div>
+          <div class="a-detail">
+            <div class="a-title">Suya Skewers & Zobo ordered</div>
+            <div class="a-time">Yesterday, 8:15 PM · FoliXx Bukka</div>
+          </div>
+          <a href="bukka-tracking.html" class="a-action">Track</a>
+        </div>
+        <div class="activity-item" data-type="bookings">
+          <div class="a-icon palace">♛</div>
+          <div class="a-detail">
+            <div class="a-title">Table booked at Secrets Palace</div>
+            <div class="a-time">Fri, 30 May · 11PM · VIP Package</div>
+          </div>
+          <a href="palace-reserve.html" class="a-action">View</a>
+        </div>
+        <div class="activity-item" data-type="orders">
+          <div class="a-icon bukka">🥘</div>
+          <div class="a-detail">
+            <div class="a-title">Egusi Soup & Pounded Yam</div>
+            <div class="a-time">3 days ago · FoliXx Bukka</div>
+          </div>
+          <a href="#" class="a-action" onclick="alert('Reorder (demo)')">Reorder</a>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <h2 style="font-family:var(--font-display);font-size:var(--xl);margin:24px 0 12px">Quick Actions</h2>
+      <div class="quick-actions">
+        <a href="bukka-menu.html" class="quick-card">
+          <div class="q-icon">🍛</div>
+          <div class="q-title">Order Again</div>
+          <div class="q-desc">Reorder your last Bukka meal</div>
+        </a>
+        <a href="palace-reserve.html" class="quick-card">
+          <div class="q-icon">♛</div>
+          <div class="q-title">Book a Table</div>
+          <div class="q-desc">Reserve at Secrets Palace</div>
+        </a>
+        <a href="account-loyalty.html" class="quick-card">
+          <div class="q-icon">⭐</div>
+          <div class="q-title">View Rewards</div>
+          <div class="q-desc">Check your loyalty points</div>
+        </a>
+        <a href="account-profile.html" class="quick-card">
+          <div class="q-icon">👤</div>
+          <div class="q-title">Edit Profile</div>
+          <div class="q-desc">Update your details</div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile bottom tabs -->
+  <nav class="bottom-tabs">
+    <a href="account-hub.html" class="active"><span class="icon">📊</span> Overview</a>
+    <a href="#" onclick="alert('Orders (coming soon)')"><span class="icon">📋</span> Orders</a>
+    <a href="account-loyalty.html"><span class="icon">⭐</span> Rewards</a>
+    <a href="account-profile.html"><span class="icon">👤</span> Profile</a>
+  </nav>
+
+  <script>
+    function switchBrand(brand, btn) {
+      document.querySelectorAll('.brand-toggle button').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.body.classList.toggle('palace-mode', brand === 'palace');
+    }
+    function switchActivity(type, btn) {
+      document.querySelectorAll('.activity-tabs button').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.activity-item').forEach(function(item) {
+        item.style.display = (type === 'all' || item.getAttribute('data-type') === type) ? 'flex' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

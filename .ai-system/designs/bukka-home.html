@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoliXx Bukka — Taste the Tradition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAF8; --surface: #FFFFFF; --elevated: #FFFFFF;
+      --fg: #1A1614; --muted: #7A706A;
+      --border: #E8E4DD; --border-strong: #D4CECC;
+      --primary: #E85D1A; --primary-hover: #C44510; --primary-light: #FFF5ED;
+      --secondary: #F5A623; --success: #2E7D52;
+      --accent: #E85D1A;
+      --overlay: rgba(26,22,20,0.6);
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --xs: 0.75rem; --sm: 0.875rem; --base: 1rem; --lg: 1.125rem;
+      --xl: 1.25rem; --2xl: 1.5rem; --3xl: 1.875rem; --4xl: 2.25rem;
+      --5xl: 3rem; --6xl: 3.75rem;
+      --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+      --space-12: 3rem; --space-16: 4rem; --space-20: 5rem; --space-24: 6rem;
+      --radius-xl: 1rem; --radius-full: 9999px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font: var(--base)/1.6 var(--font-body);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+
+    .navbar {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 40px;
+      background: var(--surface);
+      transition: box-shadow 0.3s;
+    }
+    .navbar.scrolled { box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .navbar .logo-group { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .navbar .logo-icon {
+      width:36px; height:36px;
+      background: var(--primary); border-radius: 50%;
+      display:flex; align-items:center; justify-content:center;
+      color: #fff; font-weight:800; font-size:18px;
+      font-family: var(--font-display);
+    }
+    .navbar .logo-text { font-family: var(--font-display); font-size: var(--xl); font-weight:700; color: var(--primary); }
+    .navbar .nav-links { display:flex; gap:24px; }
+    .navbar .nav-links a { color: var(--muted); text-decoration:none; font-size:var(--sm); font-weight:500; transition:color 0.2s; position:relative; }
+    .navbar .nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--primary); transition:width 0.3s; border-radius:1px; }
+    .navbar .nav-links a:hover { color: var(--fg); }
+    .navbar .nav-links a:hover::after { width:100%; }
+    .navbar .nav-right { display:flex; align-items:center; gap:12px; }
+    .navbar .cart-btn {
+      position: relative; display:flex; align-items:center; gap:6px;
+      padding:8px 16px; background:var(--primary-light); border:none;
+      border-radius:var(--radius-full); color:var(--primary); font-size:var(--sm);
+      font-weight:600; cursor:pointer; transition:all 0.2s;
+      text-decoration: none;
+    }
+    .navbar .cart-btn:hover { background:var(--primary); color:#fff; }
+    .navbar .cart-btn .badge {
+      position:absolute; top:-4px; right:-4px;
+      width:20px; height:20px; background:var(--primary); color:#fff;
+      border-radius:50%; font-size:10px; display:flex; align-items:center;
+      justify-content:center; font-weight:700;
+    }
+    .navbar .sign-in {
+      padding:8px 20px; border:1px solid var(--border); border-radius:var(--radius-full);
+      background:transparent; color:var(--fg); font-size:var(--sm); font-weight:500;
+      cursor:pointer; transition:all 0.2s; text-decoration:none;
+    }
+    .navbar .sign-in:hover { border-color:var(--primary); color:var(--primary); }
+    .navbar .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:4px; }
+    .navbar .hamburger span { width:24px; height:2px; background:var(--fg); border-radius:1px; transition:all 0.3s; }
+
+    .mobile-nav {
+      display:none; position:fixed; inset:0; background:rgba(250,250,248,0.98);
+      backdrop-filter:blur(20px); z-index:200;
+      flex-direction:column; align-items:center; justify-content:center; gap:24px;
+      opacity:0; transition:opacity 0.4s;
+    }
+    .mobile-nav.open { display:flex; opacity:1; }
+    .mobile-nav a { font-family: var(--font-display); font-size:var(--3xl); color:var(--fg); text-decoration:none; transition:color 0.2s; }
+    .mobile-nav a:hover { color: var(--primary); }
+    .mobile-nav .close-btn { position:absolute; top:24px; right:24px; background:none; border:none; font-size:32px; cursor:pointer; color:var(--fg); }
+
+    /* Hero */
+    .hero {
+      position:relative; min-height:85vh; display:flex; align-items:center;
+      padding-top: 80px;
+      overflow: hidden;
+    }
+    .hero .bg-pattern {
+      position:absolute; inset:0;
+      background: linear-gradient(135deg, #1A1614 0%, #2A2420 50%, #3D3733 100%);
+    }
+    .hero .bg-pattern::before {
+      content:''; position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(232,93,26,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 30%, rgba(245,166,35,0.1) 0%, transparent 40%);
+    }
+    .hero .overlay {
+      position:absolute; inset:0;
+      background: linear-gradient(to right, rgba(26,22,20,0.85) 0%, rgba(26,22,20,0.85) 40%, transparent 100%);
+    }
+    .hero .content {
+      position:relative; z-index:2;
+      max-width: 500px;
+      padding: 40px;
+    }
+    .hero .eyebrow {
+      font-size: var(--xs); text-transform: uppercase; letter-spacing: 0.25em;
+      color: var(--primary); font-weight:600; margin-bottom:12px;
+    }
+    .hero h1 {
+      font-family: var(--font-display); font-size: clamp(var(--4xl), 5vw, var(--6xl));
+      font-weight: 700; color: #fff; line-height: 1.1; margin-bottom:16px;
+    }
+    .hero .sub { color: rgba(255,255,255,0.7); font-size: var(--lg); margin-bottom:24px; line-height:1.7; }
+    .hero .order-type {
+      display:flex; gap:8px; margin-bottom:24px;
+    }
+    .hero .order-type button {
+      padding:8px 20px; border:1px solid rgba(255,255,255,0.2); border-radius:var(--radius-full);
+      background:transparent; color:rgba(255,255,255,0.8); font-size:var(--sm); font-weight:500;
+      cursor:pointer; transition:all 0.2s; font-family:var(--font-body);
+    }
+    .hero .order-type button.active { background:var(--primary); border-color:var(--primary); color:#fff; }
+    .hero .order-type button:hover:not(.active) { border-color:rgba(255,255,255,0.4); }
+    .hero .cta {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:14px 32px; background:var(--primary); color:#fff;
+      border:none; border-radius:var(--radius-full); font-size:var(--sm);
+      font-weight:600; cursor:pointer; text-decoration:none;
+      transition:all 0.3s; text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .hero .cta:hover { background:var(--primary-hover); transform:translateY(-2px); }
+    .hero .stats {
+      display:flex; gap:24px; margin-top:32px;
+    }
+    .hero .stats .stat {
+      padding:8px 20px; background:rgba(255,255,255,0.06);
+      border-radius:var(--radius-full); backdrop-filter:blur(8px);
+    }
+    .hero .stats .stat .num { font-weight:700; color:#fff; font-size:var(--sm); }
+    .hero .stats .stat .lbl { font-size:var(--xs); color:rgba(255,255,255,0.5); }
+
+    /* Service banner */
+    .service-banner {
+      background: var(--primary-light);
+      padding: 40px 24px;
+    }
+    .service-banner .inner {
+      max-width: 1200px; margin:0 auto;
+      display: grid; grid-template-columns: repeat(3,1fr); gap:24px;
+    }
+    .service-card {
+      text-align: center; padding:16px;
+    }
+    .service-card .icon {
+      width:56px; height:56px; margin:0 auto 12px;
+      background: var(--primary); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:24px;
+    }
+    .service-card h3 { font-size:var(--lg); margin-bottom:4px; }
+    .service-card p { color:var(--muted); font-size:var(--sm); }
+
+    /* Sections */
+    .section {
+      padding: var(--space-16) 24px;
+      max-width: 1200px; margin:0 auto;
+    }
+    .section-header {
+      display:flex; justify-content:space-between; align-items:flex-end;
+      margin-bottom: 24px; flex-wrap:wrap; gap:12px;
+    }
+    .section-header h2 {
+      font-family: var(--font-display); font-size: clamp(var(--2xl),3vw,var(--4xl));
+    }
+    .section-header a { color: var(--primary); text-decoration:none; font-weight:600; font-size:var(--sm); transition:gap 0.3s; display:flex; align-items:center; gap:4px; }
+    .section-header a:hover { gap:10px; }
+
+    /* Category pills */
+    .category-pills {
+      display:flex; gap:8px; overflow-x:auto; padding-bottom:8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .category-pills button {
+      flex-shrink:0; padding:8px 20px; border:1px solid var(--border);
+      border-radius:var(--radius-full); background:var(--surface); color:var(--muted);
+      font-size:var(--sm); font-weight:500; cursor:pointer; transition:all 0.2s;
+      font-family:var(--font-body);
+    }
+    .category-pills button.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .category-pills button:hover:not(.active) { border-color:var(--primary); color:var(--primary); }
+
+    /* Menu item card */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 20px;
+    }
+    .menu-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      cursor: pointer;
+    }
+    .menu-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(232,93,26,0.1); }
+    .menu-card .image {
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items:center; justify-content:center;
+    }
+    .menu-card .image .bg-grad {
+      position:absolute; inset:0;
+      background: linear-gradient(135deg, oklch(80% 0.04 50), oklch(75% 0.06 40));
+    }
+    .menu-card .image .badge {
+      position:absolute; top:8px; left:8px;
+      padding:3px 10px; border-radius:4px;
+      font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em;
+    }
+    .menu-card .image .badge.popular { background:var(--primary); color:#fff; }
+    .menu-card .image .badge.special { background:var(--secondary); color:var(--fg); }
+    .menu-card .image .emoji { font-size:36px; z-index:1; }
+    .menu-card .body { padding:16px; }
+    .menu-card .body .top { display:flex; justify-content:space-between; align-items:start; }
+    .menu-card .body .name { font-weight:600; font-size:var(--base); }
+    .menu-card .body .price { color:var(--primary); font-weight:700; font-family:var(--font-mono); }
+    .menu-card .body .desc { color:var(--muted); font-size:var(--sm); margin-top:4px; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+    .menu-card .body .tags { display:flex; gap:4px; margin-top:8px; flex-wrap:wrap; }
+    .menu-card .body .tags span {
+      padding:2px 8px; font-size:10px; border-radius:4px;
+      background:var(--primary-light); color:var(--primary);
+    }
+    .menu-card .body .add-row { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+    .menu-card .body .qty { display:flex; align-items:center; gap:8px; }
+    .menu-card .body .qty button {
+      width:28px; height:28px; border:1px solid var(--border); border-radius:50%;
+      background:transparent; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center;
+      transition:all 0.2s; color:var(--muted);
+    }
+    .menu-card .body .qty button:hover { border-color:var(--primary); color:var(--primary); }
+    .menu-card .body .qty span { min-width:16px; text-align:center; font-weight:600; font-size:var(--sm); }
+    .menu-card .body .add-btn {
+      padding:6px 14px; background:var(--primary); color:#fff; border:none;
+      border-radius:var(--radius-full); font-size:11px; font-weight:600; cursor:pointer;
+      transition:all 0.2s;
+    }
+    .menu-card .body .add-btn:hover { background:var(--primary-hover); }
+
+    /* How it works */
+    .how-it-works {
+      background: var(--surface);
+      padding: var(--space-16) 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .how-it-works .inner { max-width: 900px; margin: 0 auto; }
+    .steps-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:24px; margin-top:24px; }
+    .step-card { text-align:center; }
+    .step-card .step-num {
+      width:48px; height:48px; margin:0 auto 12px;
+      background: var(--primary); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-weight:800; font-size:var(--xl); font-family:var(--font-display);
+    }
+    .step-card h4 { margin-bottom:4px; }
+    .step-card p { color:var(--muted); font-size:var(--sm); }
+
+    /* Loyalty banner */
+    .loyalty-banner {
+      padding: var(--space-12) 24px;
+      background: linear-gradient(135deg, #1A1614 0%, var(--primary) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .loyalty-banner::before {
+      content:''; position:absolute; inset:0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 40px);
+    }
+    .loyalty-banner .inner {
+      max-width: 800px; margin:0 auto; text-align:center; position:relative; z-index:1;
+    }
+    .loyalty-banner h2 { font-family:var(--font-display); color:#fff; font-size:var(--3xl); margin-bottom:8px; }
+    .loyalty-banner p { color:rgba(255,255,255,0.7); margin-bottom:16px; }
+    .loyalty-banner .cta {
+      display:inline-flex; padding:12px 28px;
+      background:#fff; color:var(--primary); border:none;
+      border-radius:var(--radius-full); font-weight:600; font-size:var(--sm);
+      cursor:pointer; text-decoration:none; transition:all 0.3s;
+    }
+    .loyalty-banner .cta:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+
+    /* Footer */
+    .footer {
+      background: #2A2420;
+      padding: var(--space-12) 24px 24px;
+    }
+    .footer .inner {
+      max-width: 1200px; margin:0 auto;
+      display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:32px;
+    }
+    .footer h4 { font-family:var(--font-display); color:#fff; margin-bottom:12px; }
+    .footer p, .footer a { color:rgba(255,255,255,0.5); font-size:var(--sm); line-height:2; text-decoration:none; display:block; }
+    .footer a:hover { color:var(--primary); }
+    .footer .bottom {
+      max-width:1200px; margin:24px auto 0; padding-top:16px;
+      border-top:1px solid rgba(255,255,255,0.08);
+      display:flex; justify-content:space-between; flex-wrap:wrap;
+      font-size:var(--xs); color:rgba(255,255,255,0.3);
+    }
+
+    @media (max-width: 1024px) { .menu-grid { grid-template-columns: repeat(3,1fr); } .footer .inner { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 768px) {
+      .navbar { padding: 12px 20px; }
+      .navbar .nav-links, .navbar .sign-in { display:none; }
+      .navbar .hamburger { display:flex; }
+      .hero .content { padding: 24px; }
+      .hero .stats { flex-direction:column; gap:8px; }
+      .hero .stats .stat { width:fit-content; }
+      .service-banner .inner { grid-template-columns:1fr; }
+      .menu-grid { grid-template-columns: repeat(2,1fr); }
+      .steps-grid { grid-template-columns: repeat(2,1fr); }
+      .footer .inner { grid-template-columns:1fr; }
+      .hero { min-height: auto; padding-bottom: 60px; }
+    }
+    @media (max-width: 480px) { .menu-grid { grid-template-columns: 1fr; } .steps-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="mobile-nav" id="mobileNav">
+    <button class="close-btn" onclick="closeMobileNav()">✕</button>
+    <a href="bukka-home.html" onclick="closeMobileNav()">Home</a>
+    <a href="bukka-menu.html" onclick="closeMobileNav()">Menu</a>
+    <a href="bukka-cart.html" onclick="closeMobileNav()">Cart</a>
+    <a href="account-hub.html" onclick="closeMobileNav()">Account</a>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="logo-group">
+      <div class="logo-icon">B</div>
+      <div class="logo-text">FoliXx Bukka</div>
+    </a>
+    <div class="nav-links">
+      <a href="bukka-home.html" style="color:var(--fg)">Home</a>
+      <a href="bukka-menu.html">Menu</a>
+      <a href="bukka-cart.html">Cart</a>
+      <a href="account-hub.html">Account</a>
+    </div>
+    <div class="nav-right">
+      <a href="bukka-cart.html" class="cart-btn">
+        🛒 <span>Cart</span>
+        <span class="badge">3</span>
+      </a>
+      <a href="account-hub.html" class="sign-in">Sign In</a>
+      <button class="hamburger" onclick="openMobileNav()"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="bg-pattern"></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="eyebrow">FoliXx Bukka</div>
+      <h1>Taste the Tradition,<br>Feel the Flavor</h1>
+      <p class="sub">From classic Nigerian dishes to contemporary cravings, every meal is a masterpiece.</p>
+      <div class="order-type">
+        <button class="active">Delivery</button>
+        <button>Takeaway</button>
+        <button>Dine-in</button>
+      </div>
+      <a href="bukka-menu.html" class="cta">Explore Menu →</a>
+      <div class="stats">
+        <div class="stat"><span class="num">300+</span> <span class="lbl">Menu Items</span></div>
+        <div class="stat"><span class="num">12–35 min</span> <span class="lbl">Delivery</span></div>
+        <div class="stat"><span class="num">4.8</span> <span class="lbl">★ Rating</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service banner -->
+  <div class="service-banner">
+    <div class="inner">
+      <div class="service-card">
+        <div class="icon">🚚</div>
+        <h3>Fast Delivery</h3>
+        <p>Hot food at your doorstep in 35 minutes or less. Free delivery on orders above ₦5,000.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">🍲</div>
+        <h3>Premium Quality</h3>
+        <p>Fresh ingredients, traditional recipes, and modern presentation. Every dish is crafted with care.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon">✨</div>
+        <h3>Easy Ordering</h3>
+        <p>Order in seconds. Track in real-time. Pay securely. Enjoy seamlessly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Specials -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Today's <span style="color:var(--primary)">Specials</span></h2>
+      <a href="bukka-menu.html">View Full Menu →</a>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFE8D1,#FFC99A)"></div>
+          <div class="badge popular">Popular</div>
+          <div class="emoji">🍛</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Jollof Rice & Chicken</div>
+            <div class="price">₦3,500</div>
+          </div>
+          <div class="desc">Party jollof with grilled chicken, plantain & coleslaw</div>
+          <div class="tags"><span>Popular</span><span>Main Dish</span></div>
+          <div class="add-row">
+            <div class="qty">
+              <button onclick="event.stopPropagation()">−</button>
+              <span>1</span>
+              <button onclick="event.stopPropagation()">+</button>
+            </div>
+            <button class="add-btn" onclick="event.stopPropagation()">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFE8D1,#FFA563)"></div>
+          <div class="badge special">Chef's Pick</div>
+          <div class="emoji">🥘</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Egusi Soup & Pounded Yam</div>
+            <div class="price">₦4,200</div>
+          </div>
+          <div class="desc">Rich melon seed soup with assorted meat & smooth pounded yam</div>
+          <div class="tags"><span>Classic</span><span>Protein</span></div>
+          <div class="add-row">
+            <div class="qty">
+              <button onclick="event.stopPropagation()">−</button>
+              <span>0</span>
+              <button onclick="event.stopPropagation()">+</button>
+            </div>
+            <button class="add-btn" onclick="event.stopPropagation()">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFC99A,#FF7A2B)"></div>
+          <div class="badge popular">Popular</div>
+          <div class="emoji">🥩</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Suya Skewers</div>
+            <div class="price">₦2,800</div>
+          </div>
+          <div class="desc">Spiced grilled beef skewers with yaji, onions & pepper sauce</div>
+          <div class="tags"><span>Spicy</span><span>Starter</span></div>
+          <div class="add-row">
+            <div class="qty">
+              <button onclick="event.stopPropagation()">−</button>
+              <span>0</span>
+              <button onclick="event.stopPropagation()">+</button>
+            </div>
+            <button class="add-btn" onclick="event.stopPropagation()">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFF5ED,#FFE8D1)"></div>
+          <div class="badge special">New</div>
+          <div class="emoji">🥤</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Zobo Lemonade</div>
+            <div class="price">₦1,000</div>
+          </div>
+          <div class="desc">Hibiscus drink with lemon, mint & a touch of ginger</div>
+          <div class="tags"><span>Drink</span><span>Refreshing</span></div>
+          <div class="add-row">
+            <div class="qty">
+              <button onclick="event.stopPropagation()">−</button>
+              <span>0</span>
+              <button onclick="event.stopPropagation()">+</button>
+            </div>
+            <button class="add-btn" onclick="event.stopPropagation()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category quick-nav -->
+  <div class="section" style="padding-top:0">
+    <div class="category-pills">
+      <button class="active">All</button>
+      <button>Starters</button>
+      <button>Main Dishes</button>
+      <button>Proteins</button>
+      <button>Sides</button>
+      <button>Drinks</button>
+      <button>Desserts</button>
+    </div>
+  </div>
+
+  <!-- Popular Items -->
+  <div class="section" style="padding-top:0">
+    <div class="section-header">
+      <h2>Customer <span style="color:var(--primary)">Favourites</span></h2>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFE8D1,#E85D1A)"></div>
+          <div class="badge popular">★ 4.9</div>
+          <div class="emoji">🍗</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Pepper Soup & Catfish</div>
+            <div class="price">₦3,800</div>
+          </div>
+          <div class="desc">Spicy broth with fresh catfish, herbs & uziza leaves</div>
+          <div class="tags"><span>Spicy</span><span>Seafood</span></div>
+          <div class="add-row">
+            <div class="qty">
+              <button>−</button><span>0</span><button>+</button>
+            </div>
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#F5A623,#E85D1A)"></div>
+          <div class="badge popular">★ 4.8</div>
+          <div class="emoji">🥟</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Moi Moi & Pap</div>
+            <div class="price">₦2,500</div>
+          </div>
+          <div class="desc">Steamed bean pudding with custard pap & akamu</div>
+          <div class="tags"><span>Breakfast</span><span>Light</span></div>
+          <div class="add-row">
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFC99A,#FF7A2B)"></div>
+          <div class="badge popular">★ 4.7</div>
+          <div class="emoji">🍚</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Fried Rice & Grilled Fish</div>
+            <div class="price">₦4,500</div>
+          </div>
+          <div class="desc">Nigerian fried rice with whole grilled tilapia & plantain</div>
+          <div class="tags"><span>Popular</span><span>Seafood</span></div>
+          <div class="add-row">
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-card">
+        <div class="image">
+          <div class="bg-grad" style="background:linear-gradient(135deg,#FFF5ED,#F5A623)"></div>
+          <div class="badge popular">★ 4.9</div>
+          <div class="emoji">🧁</div>
+        </div>
+        <div class="body">
+          <div class="top">
+            <div class="name">Puff Puff (6 pcs)</div>
+            <div class="price">₦1,200</div>
+          </div>
+          <div class="desc">Fluffy deep-fried dough balls, lightly sweetened</div>
+          <div class="tags"><span>Snack</span><span>Dessert</span></div>
+          <div class="add-row">
+            <button class="add-btn">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="how-it-works">
+    <div class="inner" style="text-align:center">
+      <h2 style="font-family:var(--font-display);font-size:var(--3xl)">How It <span style="color:var(--primary)">Works</span></h2>
+      <p style="color:var(--muted);margin-top:4px">From craving to doorstep in four simple steps</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h4>Choose</h4>
+          <p>Browse our menu and pick your favourites</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h4>Customise</h4>
+          <p>Select your proteins, spice level & sides</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h4>Pay</h4>
+          <p>Secure checkout with Paystack or cash</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h4>Delivered</h4>
+          <p>Track your order in real-time to your door</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loyalty teaser -->
+  <div class="loyalty-banner">
+    <div class="inner">
+      <h2>Every Meal Earns Rewards</h2>
+      <p>Earn points on every order. Redeem for free meals, exclusive discounts, and special treats. Join thousands of loyal Bukka fans.</p>
+      <a href="account-loyalty.html" class="cta">Join the Programme →</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="inner">
+      <div>
+        <h4>FoliXx Bukka</h4>
+        <p style="line-height:1.7">Taste the tradition, feel the flavor. Nigerian cuisine at its finest — crafted with love, delivered with care.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <a href="bukka-menu.html">Menu</a>
+        <a href="bukka-cart.html">Cart</a>
+        <a href="bukka-tracking.html">Track Order</a>
+        <a href="account-hub.html">My Account</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>15 Awolowo Road, Ikoyi, Lagos</p>
+        <p>+234 800 BUKKA</p>
+        <p>hello@folixxbukka.com</p>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <p>Mon–Sun: 8AM – 10PM</p>
+        <p>Delivery: 9AM – 9PM</p>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2025 FoliXx Bukka · FoliXx Hospitality Group</span>
+      <div style="display:flex;gap:12px">
+        <a href="#">Privacy</a> · <a href="#">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', function() { navbar.classList.toggle('scrolled', window.scrollY > 40); });
+    function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+    function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+    // Order type toggle
+    document.querySelectorAll('.order-type button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.order-type button').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+      });
+    });
+    // Category pills
+    document.querySelectorAll('.category-pills button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-pills button').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

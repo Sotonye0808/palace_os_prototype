@@ -1,0 +1,74 @@
+{
+  "navigation": {
+    "home": "Home",
+    "menu": "Menu",
+    "orders": "Orders",
+    "reservations": "Reservations",
+    "events": "Events",
+    "loyalty": "Loyalty",
+    "profile": "Profile",
+    "admin": "Admin",
+    "checkout": "Checkout",
+    "cart": "Cart",
+    "addressBook": "Address Book"
+  },
+  "actions": {
+    "addToCart": "Add to Cart",
+    "removeItem": "Remove Item",
+    "updateQuantity": "Update Quantity",
+    "proceedToCheckout": "Proceed to Checkout",
+    "placeOrder": "Place Order",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "error": "An error occurred",
+    "success": "Success"
+  },
+  "currency": {
+    "symbol": "₦",
+    "code": "NGN",
+    "format": "{amount, number, ::currency/NGN}"
+  },
+  "phone": {
+    "placeholder": "+234 XXX XXX XXXX",
+    "format": "+234 {area} {prefix} {line}",
+    "validation": {
+      "required": "Phone number is required",
+      "invalid": "Please enter a valid Nigerian phone number"
+    }
+  },
+  "common": {
+    "welcome": "Welcome",
+    "thankYou": "Thank you",
+    "pleaseWait": "Please wait",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "open": "Open",
+    "select": "Select",
+    "choose": "Choose",
+    "or": "or",
+    "and": "and",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "details": "Details",
+    "information": "Information",
+    "settings": "Settings",
+    "help": "Help",
+    "support": "Support",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us",
+    "about": "About Us"
+  }
+}

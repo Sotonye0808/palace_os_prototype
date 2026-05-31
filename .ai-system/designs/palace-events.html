@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Events — Secrets Palace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(12% 0.005 260); --surface: oklch(14% 0.008 260); --elevated: oklch(16% 0.01 260);
+      --fg: oklch(95% 0.003 260); --muted: oklch(45% 0.015 260); --border: rgba(173, 173, 200, 0.12);
+      --gold: #D4A017; --gold-light: #FBBF24; --violet: #8B5CF6;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-accent: 'Cinzel', Georgia, serif;
+      --xs: 0.75rem; --sm: 0.875rem; --base: 1rem; --lg: 1.125rem;
+      --xl: 1.25rem; --2xl: 1.5rem; --3xl: 1.875rem; --4xl: 2.25rem; --5xl: 3rem;
+      --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem; --space-24: 6rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font: var(--base)/1.6 var(--font-body);
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
+
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 40px;
+      background: rgba(20,20,42,0.7);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar .brand-group { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .navbar .crest { width: 32px; height: 32px; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); }
+    .navbar .wordmark { font-family: var(--font-display); font-size: var(--lg); font-weight: 700; color: var(--gold); letter-spacing: 0.15em; }
+    .navbar .nav-links { display: flex; gap: 32px; }
+    .navbar .nav-links a { color: var(--muted); text-decoration: none; font-size: var(--sm); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; position: relative; }
+    .navbar .nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:1px; background:var(--gold); transition:width 0.3s; }
+    .navbar .nav-links a:hover { color: var(--fg); }
+    .navbar .nav-links a:hover::after { width: 100%; }
+    .navbar .nav-cta { display: inline-flex; padding: 10px 24px; border: 1px solid var(--gold); border-radius: 6px; color: var(--gold); font-size: var(--sm); font-weight: 600; background: transparent; cursor: pointer; text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; transition: all 0.3s; }
+    .navbar .nav-cta:hover { background: var(--gold); color: var(--bg); }
+    .navbar .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .navbar .hamburger span { width: 24px; height: 2px; background: var(--gold); border-radius: 1px; }
+
+    .mobile-nav { display: none; position: fixed; inset:0; background: rgba(8,8,16,0.98); backdrop-filter:blur(20px); z-index:200; flex-direction:column; align-items:center; justify-content:center; gap:32px; opacity:0; transition:opacity 0.4s; }
+    .mobile-nav.open { display:flex; opacity:1; }
+    .mobile-nav a { color: var(--fg); font-family: var(--font-display); font-size: var(--4xl); text-decoration: none; }
+    .mobile-nav a:hover { color: var(--gold); }
+    .mobile-nav .close-btn { position:absolute; top:24px; right:24px; background:none; border:none; color:var(--gold); font-size:32px; cursor:pointer; }
+
+    /* Hero */
+    .hero {
+      padding: 120px 24px 80px;
+      text-align: center;
+      background: linear-gradient(180deg, oklch(10% 0.008 260) 0%, var(--bg) 100%);
+    }
+    .hero .label { font-family: var(--font-accent); font-size: var(--xs); letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .hero h1 { font-family: var(--font-display); font-size: clamp(var(--3xl), 5vw, var(--5xl)); font-weight: 700; }
+    .hero h1 .gold { color: var(--gold); }
+    .hero p { color: var(--muted); max-width: 500px; margin: 12px auto 0; }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .filter-pill {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--muted);
+      font-size: var(--sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-body);
+    }
+    .filter-pill:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-pill.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+    /* Events grid */
+    .events-section { max-width: 1280px; margin: 0 auto; padding: 0 24px 80px; }
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .event-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+    .event-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 40px rgba(212,160,23,0.12);
+      border-color: rgba(212,160,23,0.2);
+    }
+    .event-card .poster {
+      aspect-ratio: 16/9;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .event-card .poster .bg-grad {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, oklch(18% 0.02 260), oklch(14% 0.03 280));
+    }
+    .event-card .poster .bg-grad::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(212,160,23,0.1), transparent 70%);
+    }
+    .event-card .poster .badge {
+      position: absolute; top: 12px; left: 12px;
+      padding: 4px 12px; border-radius: 4px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;
+    }
+    .event-card .poster .badge.tonight { background: var(--gold); color: var(--bg); }
+    .event-card .poster .badge.upcoming { background: rgba(139,92,246,0.2); color: var(--violet); border: 1px solid rgba(139,92,246,0.3); }
+    .event-card .poster .badge.sold-out { background: rgba(239,68,68,0.2); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); }
+    .event-card .poster .badge.past { background: rgba(173,173,200,0.1); color: var(--muted); }
+    .event-card .poster .icon { font-size: 40px; color: var(--gold); opacity: 0.25; z-index: 1; }
+    .event-card .body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .event-card .date { font-size: var(--sm); color: var(--muted); margin-bottom: 4px; }
+    .event-card .name { font-family: var(--font-display); font-size: var(--xl); font-weight: 700; margin-bottom: 4px; }
+    .event-card .performer { color: var(--gold); font-size: var(--sm); margin-bottom: 8px; }
+    .event-card .desc { color: var(--muted); font-size: var(--sm); line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .event-card .pricing { display: flex; justify-content: space-between; font-size: var(--sm); color: var(--muted); margin-top: auto; margin-bottom: 12px; }
+    .event-card .event-cta {
+      display: block; width: 100%; padding: 10px;
+      border: 1px solid rgba(212,160,23,0.3); border-radius: 6px;
+      background: transparent; color: var(--gold);
+      font-size: var(--sm); font-weight: 600; cursor: pointer;
+      transition: all 0.3s; text-align: center; text-decoration: none;
+    }
+    .event-card .event-cta:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+    /* Past events */
+    .past-section { opacity: 0.5; }
+    .past-section .event-card .poster .bg-grad { filter: grayscale(0.8); }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0 24px;
+    }
+
+    /* Footer */
+    .footer {
+      background: oklch(7% 0.004 260);
+      border-top: 1px solid rgba(212,160,23,0.15);
+      padding: var(--space-16) var(--space-8) var(--space-8);
+    }
+    .footer .inner { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1.5fr; gap:var(--space-10); }
+    .footer h4 { font-family: var(--font-display); font-size: var(--lg); color: var(--gold); margin-bottom: var(--space-4); }
+    .footer p, .footer a { color: var(--muted); font-size: var(--sm); line-height: 2; text-decoration: none; display: block; }
+    .footer a:hover { color: var(--gold); }
+    .footer .social { display: flex; gap: 12px; margin-top: var(--space-4); }
+    .footer .social a { width:40px; height:40px; border:1px solid rgba(212,160,23,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:var(--sm); transition:all 0.3s; }
+    .footer .social a:hover { border-color:var(--gold); color:var(--gold); background:rgba(212,160,23,0.1); }
+
+    @media (max-width: 1024px) { .events-grid { grid-template-columns: repeat(2, 1fr); } .footer .inner { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 768px) {
+      .navbar { padding: 12px 20px; }
+      .navbar .nav-links, .navbar .nav-cta { display: none; }
+      .navbar .hamburger { display: flex; }
+      .events-grid { grid-template-columns: 1fr; }
+      .hero { padding: 100px 16px 60px; }
+      .footer .inner { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-nav" id="mobileNav">
+    <button class="close-btn" onclick="closeMobileNav()">✕</button>
+    <a href="palace-home.html" onclick="closeMobileNav()">Home</a>
+    <a href="palace-events.html" onclick="closeMobileNav()">Events</a>
+    <a href="palace-reserve.html" onclick="closeMobileNav()">Reserve</a>
+    <a href="account-hub.html" onclick="closeMobileNav()">Account</a>
+  </div>
+
+  <nav class="navbar">
+    <a href="palace-home.html" class="brand-group">
+      <div class="crest">♛</div>
+      <div class="wordmark">SECRETS PALACE</div>
+    </a>
+    <div class="nav-links">
+      <a href="palace-home.html">Home</a>
+      <a href="palace-events.html" style="color:var(--gold)">Events</a>
+      <a href="palace-reserve.html">Reserve</a>
+      <a href="account-hub.html">Account</a>
+    </div>
+    <a href="palace-reserve.html" class="nav-cta">Book Now</a>
+    <button class="hamburger" onclick="openMobileNav()"><span></span><span></span><span></span></button>
+  </nav>
+
+  <section class="hero">
+    <div class="label">Secrets Palace</div>
+    <h1>Events & <span class="gold">Nights</span></h1>
+    <p>"Every night at Secrets is a curated masterpiece."</p>
+  </section>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-pill active" data-filter="all" onclick="filterEvents('all',this)">All</button>
+    <button class="filter-pill" data-filter="tonight" onclick="filterEvents('tonight',this)">Tonight</button>
+    <button class="filter-pill" data-filter="this-week" onclick="filterEvents('this-week',this)">This Week</button>
+    <button class="filter-pill" data-filter="vip" onclick="filterEvents('vip',this)">VIP Events</button>
+    <button class="filter-pill" data-filter="special" onclick="filterEvents('special',this)">Special Occasions</button>
+  </div>
+
+  <div class="events-section">
+    <div class="events-grid" id="eventsGrid">
+      <a href="palace-event-detail.html" class="event-card" data-category="tonight this-week">
+        <div class="poster">
+          <div class="bg-grad"></div>
+          <div class="badge tonight">Tonight</div>
+          <div class="icon">♪</div>
+        </div>
+        <div class="body">
+          <div class="date">Fri, 30 May · 11PM – 4AM</div>
+          <div class="name">AFROBEATS FRIDAY</div>
+          <div class="performer">ft. DJ Spinall</div>
+          <div class="desc">The biggest Afrobeats party in Lagos. DJ Spinall takes over the decks for a night of non-stop hits.</div>
+          <div class="pricing"><span>General: ₦15,000</span><span>VIP: ₦35,000</span></div>
+          <span class="event-cta">Get Tickets</span>
+        </div>
+      </a>
+
+      <a href="palace-event-detail.html" class="event-card" data-category="tonight this-week vip">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(20% 0.03 280),oklch(14% 0.04 300))"></div>
+          <div class="badge tonight">Tonight</div>
+          <div class="icon">✦</div>
+        </div>
+        <div class="body">
+          <div class="date">Fri, 30 May · 11PM – 5AM</div>
+          <div class="name">VVIP LOUNGE NIGHT</div>
+          <div class="performer">Exclusive · Invite Only</div>
+          <div class="desc">The ultimate VIP experience. Private lounge, premium champagne, and curated guest list.</div>
+          <div class="pricing"><span>VVIP: ₦150,000</span><span>Table: ₦350,000+</span></div>
+          <span class="event-cta">Request Access</span>
+        </div>
+      </a>
+
+      <a href="palace-event-detail.html" class="event-card" data-category="this-week">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(18% 0.025 300),oklch(14% 0.03 320))"></div>
+          <div class="badge upcoming">Upcoming</div>
+          <div class="icon">☾</div>
+        </div>
+        <div class="body">
+          <div class="date">Sat, 31 May · 10PM – 4AM</div>
+          <div class="name">LADIES NIGHT</div>
+          <div class="performer">Live Performance</div>
+          <div class="desc">Celebrating the women of Lagos. Special performances, complimentary cocktails for ladies until midnight.</div>
+          <div class="pricing"><span>General: ₦10,000</span><span>VIP: ₦25,000</span></div>
+          <span class="event-cta">Get Tickets</span>
+        </div>
+      </a>
+
+      <a href="palace-event-detail.html" class="event-card" data-category="this-week special">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(18% 0.015 240),oklch(14% 0.02 250))"></div>
+          <div class="badge upcoming">Upcoming</div>
+          <div class="icon">★</div>
+        </div>
+        <div class="body">
+          <div class="date">Sun, 1 Jun · 9PM – 3AM</div>
+          <div class="name">SUNDAY SOIREE</div>
+          <div class="performer">DJ Cuppy</div>
+          <div class="desc">End your weekend in style. DJ Cuppy brings the energy for an unforgettable Sunday night.</div>
+          <div class="pricing"><span>General: ₦12,000</span><span>VIP: ₦30,000</span></div>
+          <span class="event-cta">Get Tickets</span>
+        </div>
+      </a>
+
+      <a href="palace-event-detail.html" class="event-card" data-category="special vip">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(22% 0.04 30),oklch(16% 0.03 350))"></div>
+          <div class="badge upcoming">Upcoming</div>
+          <div class="icon">♛</div>
+        </div>
+        <div class="body">
+          <div class="date">Thu, 5 Jun · 8PM – 2AM</div>
+          <div class="name">ROYAL GALA NIGHT</div>
+          <div class="performer">Black Tie · Live Orchestra</div>
+          <div class="desc">An evening of elegance and sophistication. Fine dining, live jazz, and premium champagne.</div>
+          <div class="pricing"><span>Standard: ₦50,000</span><span>Royal: ₦120,000</span></div>
+          <span class="event-cta">Book Now</span>
+        </div>
+      </a>
+
+      <a href="palace-event-detail.html" class="event-card" data-category="special">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(18% 0.02 200),oklch(14% 0.025 220))"></div>
+          <div class="badge upcoming">Upcoming</div>
+          <div class="icon">✦</div>
+        </div>
+        <div class="body">
+          <div class="date">Fri, 13 Jun · 10PM – 5AM</div>
+          <div class="name">AMAPIANO WAVE</div>
+          <div class="performer">ft. Major League DJz</div>
+          <div class="desc">South African Amapiano meets Lagos energy. Major League DJz bring the log drum sound.</div>
+          <div class="pricing"><span>General: ₦18,000</span><span>VIP: ₦40,000</span></div>
+          <span class="event-cta">Get Tickets</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="events-section past-section" style="padding-top:48px">
+    <h2 style="font-family:var(--font-display);font-size:var(--3xl);margin-bottom:24px">Past <span style="color:var(--gold)">Events</span></h2>
+    <div class="events-grid">
+      <div class="event-card">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(18% 0.02 260),oklch(14% 0.03 280))"></div>
+          <div class="badge past">Past</div>
+          <div class="icon">♪</div>
+        </div>
+        <div class="body" style="opacity:0.6">
+          <div class="date">Sat, 17 May · 10PM</div>
+          <div class="name">NEO SOUL SUNDAY</div>
+          <div class="performer">Live Band</div>
+          <div class="pricing"><span>General: ₦12,000</span><span>VIP: ₦28,000</span></div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(18% 0.02 260),oklch(14% 0.03 280))"></div>
+          <div class="badge past">Past</div>
+          <div class="icon">✦</div>
+        </div>
+        <div class="body" style="opacity:0.6">
+          <div class="date">Fri, 9 May · 11PM</div>
+          <div class="name">AFROBEATS FRIDAY</div>
+          <div class="performer">DJ Spinall</div>
+          <div class="pricing"><span>General: ₦15,000</span><span>VIP: ₦35,000</span></div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="poster">
+          <div class="bg-grad" style="background:linear-gradient(135deg,oklch(18% 0.02 260),oklch(14% 0.03 280))"></div>
+          <div class="badge past">Past</div>
+          <div class="icon">★</div>
+        </div>
+        <div class="body" style="opacity:0.6">
+          <div class="date">Sun, 4 May · 9PM</div>
+          <div class="name">SUNDAY SOIREE</div>
+          <div class="performer">DJ Cuppy</div>
+          <div class="pricing"><span>General: ₦12,000</span><span>VIP: ₦30,000</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="inner">
+      <div>
+        <h4>Secrets Palace</h4>
+        <p style="line-height:1.7">Lagos's most luxurious nightlife destination. Where every guest is royalty. Wednesday to Sunday, 10PM–6AM.</p>
+        <div class="social">
+          <a href="#">IG</a><a href="#">WA</a><a href="#">TA</a><a href="#">TT</a>
+        </div>
+      </div>
+      <div>
+        <h4>Navigate</h4>
+        <a href="palace-events.html">Events</a>
+        <a href="palace-reserve.html">Reserve a Table</a>
+        <a href="palace-home.html">Home</a>
+        <a href="account-hub.html">My Account</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>148 Lekki-Epe Expressway, Lekki Lagos</p>
+        <p>+234 800 SECRETS</p>
+        <p>info@secrets-palace.com</p>
+      </div>
+      <div>
+        <h4>Dress Code</h4>
+        <p>Smart Elegance Required</p>
+        <p>No slippers • No caps</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); }
+    function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); }
+
+    function filterEvents(filter, btn) {
+      document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.event-card').forEach(function(card) {
+        var cats = card.getAttribute('data-category') || '';
+        if (filter === 'all' || cats.includes(filter)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

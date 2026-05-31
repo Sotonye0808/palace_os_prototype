@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reserve a Table — Secrets Palace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(12% 0.005 260);
+      --surface: oklch(14% 0.008 260);
+      --elevated: oklch(16% 0.01 260);
+      --fg: oklch(95% 0.003 260);
+      --muted: oklch(45% 0.015 260);
+      --border: rgba(173, 173, 200, 0.12);
+      --gold: #D4A017;
+      --gold-light: #FBBF24;
+      --violet: #8B5CF6;
+      --success: #10B981;
+      --error: #EF4444;
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+      --font-accent: 'Cinzel', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --xs: 0.75rem; --sm: 0.875rem; --base: 1rem; --lg: 1.125rem;
+      --xl: 1.25rem; --2xl: 1.5rem; --3xl: 1.875rem; --4xl: 2.25rem;
+      --5xl: 3rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font: var(--base)/1.6 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 40px;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar .brand-group { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .navbar .crest { width: 32px; height: 32px; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--gold); }
+    .navbar .wordmark { font-family: var(--font-display); font-size: var(--lg); font-weight: 700; color: var(--gold); letter-spacing: 0.15em; }
+    .navbar .back-link { color: var(--muted); text-decoration: none; font-size: var(--sm); display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+    .navbar .back-link:hover { color: var(--gold); }
+
+    .page {
+      padding-top: 80px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    /* Step indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: var(--space-10) 0 var(--space-8);
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .step .circle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--sm);
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      transition: all 0.4s;
+      flex-shrink: 0;
+    }
+    .step .label {
+      font-size: var(--xs);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: color 0.4s;
+      display: none;
+    }
+    .step.active .circle { border-color: var(--gold); background: var(--gold); color: var(--bg); }
+    .step.active .label { color: var(--gold); display: block; }
+    .step.completed .circle { border-color: var(--success); background: var(--success); color: var(--fg); }
+    .step.completed .label { color: var(--success); display: block; }
+    .step-connector {
+      width: 60px;
+      height: 2px;
+      background: var(--muted);
+      margin: 0 8px;
+      transition: background 0.4s;
+    }
+    .step-connector.active { background: var(--gold); }
+
+    @media (min-width: 640px) {
+      .step .label { display: block; }
+    }
+
+    /* Step panels */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: var(--3xl);
+      margin-bottom: 8px;
+    }
+    .panel-sub {
+      color: var(--muted);
+      margin-bottom: var(--space-8);
+    }
+
+    .form-group { margin-bottom: 24px; }
+    .form-label {
+      display: block;
+      font-size: var(--sm);
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--fg);
+      font-size: var(--base);
+      font-family: var(--font-body);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,160,23,0.1); }
+    .form-input.error { border-color: var(--error); }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stepper button {
+      width: 44px; height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--fg);
+      font-size: var(--xl);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .stepper button:hover { border-color: var(--gold); color: var(--gold); }
+    .stepper .value {
+      font-size: var(--2xl);
+      font-weight: 700;
+      font-family: var(--font-display);
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .package-toggle {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .package-option {
+      flex: 1;
+      min-width: 160px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .package-option:hover { border-color: rgba(212,160,23,0.3); }
+    .package-option.selected { border-color: var(--gold); background: rgba(212,160,23,0.06); }
+    .package-option .name { font-family: var(--font-display); font-size: var(--lg); font-weight: 600; }
+    .package-option .price { color: var(--gold); font-size: var(--sm); margin-top: 4px; }
+    .package-option .desc { color: var(--muted); font-size: var(--xs); margin-top: 6px; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      font-size: var(--sm);
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.3s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: var(--sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-8);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Floor map (step 2) */
+    .floor-map {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .table-cell {
+      aspect-ratio: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .table-cell.available { border-color: rgba(212,160,23,0.3); }
+    .table-cell.available:hover { border-color: var(--gold); background: rgba(212,160,23,0.1); }
+    .table-cell.reserved { opacity: 0.3; cursor: not-allowed; }
+    .table-cell.selected { border-color: var(--gold); background: var(--gold); color: var(--bg); font-weight: 600; }
+    .table-cell.vvip { border-color: rgba(139,92,246,0.3); }
+    .table-cell.vvip.selected { border-color: var(--violet); background: var(--violet); color: var(--fg); }
+
+    .zone-legend {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .zone-legend span { display: flex; align-items: center; gap: 6px; font-size: var(--xs); color: var(--muted); }
+    .zone-legend .dot { width: 12px; height: 12px; border-radius: 3px; }
+    .zone-legend .dot.available { border: 1px solid rgba(212,160,23,0.3); background: transparent; }
+    .zone-legend .dot.selected { background: var(--gold); }
+    .zone-legend .dot.reserved { background: var(--muted); opacity: 0.3; }
+    .zone-legend .dot.vvip { border: 1px solid rgba(139,92,246,0.3); }
+
+    /* Drinks catalogue (step 3) */
+    .drinks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .drink-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .drink-card .drink-header { display: flex; justify-content: space-between; align-items: start; }
+    .drink-card .drink-name { font-family: var(--font-display); font-weight: 600; font-size: var(--lg); }
+    .drink-card .drink-price { color: var(--gold); font-weight: 600; }
+    .drink-card .drink-qty {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .drink-card .drink-qty button {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--fg);
+      cursor: pointer;
+      font-size: var(--base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .drink-card .drink-qty button:hover { border-color: var(--gold); color: var(--gold); }
+    .drink-card .drink-qty span { min-width: 20px; text-align: center; font-weight: 600; }
+
+    .drinks-total {
+      position: sticky;
+      bottom: 0;
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Confirmation (step 4) */
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .key { color: var(--muted); }
+    .summary-row .value { font-weight: 600; text-align: right; }
+
+    .success-state {
+      text-align: center;
+      padding: var(--space-12) 0;
+      display: none;
+    }
+    .success-state.show { display: block; animation: fadeIn 0.5s ease; }
+    .success-state .check { width: 80px; height: 80px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 36px; color: var(--bg); }
+    .success-state h2 { font-family: var(--font-display); font-size: var(--4xl); margin-bottom: 8px; }
+    .success-state p { color: var(--muted); }
+
+    /* Category tabs for drinks */
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .category-tab {
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--muted);
+      font-size: var(--xs);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.2s;
+    }
+    .category-tab.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+    .category-tab:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+
+    .space-2 { padding: var(--space-10) 0; }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 12px 20px; }
+      .page { padding-top: 72px; padding-left: 16px; padding-right: 16px; }
+      .step-indicator { gap: 0; padding: var(--space-6) 0; }
+      .step-connector { width: 30px; }
+      .drinks-grid { grid-template-columns: 1fr; }
+      .floor-map { grid-template-columns: repeat(4, 1fr); }
+      .package-toggle { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="palace-home.html" class="brand-group">
+      <div class="crest">♛</div>
+      <div class="wordmark">SECRETS PALACE</div>
+    </a>
+    <a href="palace-home.html" class="back-link">← Back to Home</a>
+  </nav>
+
+  <div class="page">
+    <div style="text-align:center;padding-top:var(--space-6)">
+      <h1 class="panel-title" style="font-size:var(--4xl)">Reserve <span style="color:var(--gold)">Your Table</span></h1>
+      <p class="panel-sub" style="text-align:center">Four easy steps to the ultimate nightlife experience</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step active" data-step="0">
+        <div class="circle">1</div>
+        <span class="label">Date & Party</span>
+      </div>
+      <div class="step-connector" data-connector="0"></div>
+      <div class="step" data-step="1">
+        <div class="circle">2</div>
+        <span class="label">Select Table</span>
+      </div>
+      <div class="step-connector" data-connector="1"></div>
+      <div class="step" data-step="2">
+        <div class="circle">3</div>
+        <span class="label">Drinks</span>
+      </div>
+      <div class="step-connector" data-connector="2"></div>
+      <div class="step" data-step="3">
+        <div class="circle">4</div>
+        <span class="label">Confirm</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Date & Party -->
+    <div class="step-panel active" data-panel="0">
+      <div class="form-group">
+        <label class="form-label">Select Date</label>
+        <input type="date" class="form-input" id="reserveDate" min="2025-05-28" value="2025-06-06" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Party Size</label>
+        <div class="stepper">
+          <button onclick="adjustParty(-1)">−</button>
+          <span class="value" id="partySize">4</span>
+          <button onclick="adjustParty(1)">+</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Package</label>
+        <div class="package-toggle">
+          <div class="package-option selected" data-package="standard" onclick="selectPackage(this)">
+            <div class="name">Standard</div>
+            <div class="price">₦50,000 min.</div>
+            <div class="desc">General admission seating</div>
+          </div>
+          <div class="package-option" data-package="vip" onclick="selectPackage(this)">
+            <div class="name">VIP</div>
+            <div class="price">₦150,000 min.</div>
+            <div class="desc">Premium section + host</div>
+          </div>
+          <div class="package-option" data-package="vvip" onclick="selectPackage(this)">
+            <div class="name">VVIP</div>
+            <div class="price">₦350,000 min.</div>
+            <div class="desc">Private suite + champagne</div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <div></div>
+        <button class="btn-primary" onclick="nextStep()">Check Availability →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Select Table -->
+    <div class="step-panel" data-panel="1">
+      <h3 class="panel-title">Choose Your <span style="color:var(--gold)">Table</span></h3>
+      <p class="panel-sub">Tap a table on the floor plan to select it</p>
+
+      <div class="floor-map" id="floorMap">
+        <div></div><div class="table-cell available" data-table="T1">T1</div><div class="table-cell available" data-table="T2">T2</div><div class="table-cell" data-table="T3">T3</div><div></div>
+        <div class="table-cell available" data-table="T4">T4</div><div class="table-cell" data-table="T5">T5</div><div class="table-cell available" data-table="T6">T6</div><div class="table-cell available" data-table="T7">T7</div><div class="table-cell reserved">RSV</div>
+        <div></div><div class="table-cell available" data-table="T8">T8</div><div class="table-cell reserved">RSV</div><div class="table-cell available" data-table="T9">T9</div><div></div>
+        <div class="table-cell vvip available" data-table="V1">V1</div><div class="table-cell reserved">RSV</div><div class="table-cell available" data-table="T10">T10</div><div class="table-cell available" data-table="T11">T11</div><div class="table-cell vvip available" data-table="V2">V2</div>
+        <div></div><div class="table-cell vvip" data-table="VVIP">VVIP</div><div class="table-cell available" data-table="T12">T12</div><div class="table-cell reserved">RSV</div><div></div>
+      </div>
+
+      <div class="zone-legend">
+        <span><span class="dot available"></span> Available</span>
+        <span><span class="dot selected"></span> Selected</span>
+        <span><span class="dot reserved"></span> Reserved</span>
+        <span><span class="dot vvip"></span> VVIP Zone</span>
+      </div>
+
+      <div id="tableSummary" style="display:none;background:var(--surface);border:1px solid rgba(212,160,23,0.3);border-radius:10px;padding:16px;margin-top:16px;text-align:center">
+        <div style="font-size:var(--sm);color:var(--muted)">Selected Table</div>
+        <div style="font-family:var(--font-display);font-size:var(--xl);font-weight:700;color:var(--gold)" id="selectedTableName">T1</div>
+        <div style="font-size:var(--sm);color:var(--muted)" id="tableDetails">Capacity: 4 persons · Main Floor</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="prevStep()">← Back</button>
+        <button class="btn-primary" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Drinks Pre-Order -->
+    <div class="step-panel" data-panel="2">
+      <h3 class="panel-title">Pre-Order <span style="color:var(--gold)">Drinks</span></h3>
+      <p class="panel-sub">Skip the line — your drinks will be ready at your table</p>
+
+      <div class="category-tabs">
+        <button class="category-tab active" data-cat="all" onclick="filterDrinks('all',this)">All</button>
+        <button class="category-tab" data-cat="champagne" onclick="filterDrinks('champagne',this)">Champagne</button>
+        <button class="category-tab" data-cat="spirits" onclick="filterDrinks('spirits',this)">Spirits</button>
+        <button class="category-tab" data-cat="cocktails" onclick="filterDrinks('cocktails',this)">Cocktails</button>
+        <button class="category-tab" data-cat="non-alc" onclick="filterDrinks('non-alc',this)">Non-Alcoholic</button>
+      </div>
+
+      <div class="drinks-grid" id="drinksGrid">
+        <div class="drink-card" data-cat="champagne">
+          <div class="drink-header">
+            <div>
+              <div class="drink-name">Moët & Chandon</div>
+              <div style="font-size:var(--xs);color:var(--muted)">Brut Impérial · 750ml</div>
+            </div>
+            <div class="drink-price">₦85,000</div>
+          </div>
+          <div class="drink-qty">
+            <button onclick="adjustDrink(this,-1)">−</button>
+            <span>0</span>
+            <button onclick="adjustDrink(this,1)">+</button>
+          </div>
+        </div>
+        <div class="drink-card" data-cat="champagne">
+          <div class="drink-header">
+            <div>
+              <div class="drink-name">Dom Pérignon</div>
+              <div style="font-size:var(--xs);color:var(--muted)">Vintage 2015 · 750ml</div>
+            </div>
+            <div class="drink-price">₦250,000</div>
+          </div>
+          <div class="drink-qty">
+            <button onclick="adjustDrink(this,-1)">−</button>
+            <span>0</span>
+            <button onclick="adjustDrink(this,1)">+</button>
+          </div>
+        </div>
+        <div class="drink-card" data-cat="spirits">
+          <div class="drink-header">
+            <div>
+              <div class="drink-name">Hennessy X.O</div>
+              <div style="font-size:var(--xs);color:var(--muted)">Cognac · 700ml</div>
+            </div>
+            <div class="drink-price">₦120,000</div>
+          </div>
+          <div class="drink-qty">
+            <button onclick="adjustDrink(this,-1)">−</button>
+            <span>0</span>
+            <button onclick="adjustDrink(this,1)">+</button>
+          </div>
+        </div>
+        <div class="drink-card" data-cat="spirits">
+          <div class="drink-header">
+            <div>
+              <div class="drink-name">Johnnie Walker Blue</div>
+              <div style="font-size:var(--xs);color:var(--muted)">Blended Scotch · 700ml</div>
+            </div>
+            <div class="drink-price">₦180,000</div>
+          </div>
+          <div class="drink-qty">
+            <button onclick="adjustDrink(this,-1)">−</button>
+            <span>0</span>
+            <button onclick="adjustDrink(this,1)">+</button>
+          </div>
+        </div>
+        <div class="drink-card" data-cat="cocktails">
+          <div class="drink-header">
+            <div>
+              <div class="drink-name">Secrets Signature</div>
+              <div style="font-size:var(--xs);color:var(--muted)">House cocktail · Gold rim</div>
+            </div>
+            <div class="drink-price">₦12,000</div>
+          </div>
+          <div class="drink-qty">
+            <button onclick="adjustDrink(this,-1)">−</button>
+            <span>0</span>
+            <button onclick="adjustDrink(this,1)">+</button>
+          </div>
+        </div>
+        <div class="drink-card" data-cat="non-alc">
+          <div class="drink-header">
+            <div>
+              <div class="drink-name">Premium Water</div>
+              <div style="font-size:var(--xs);color:var(--muted)">Acqua Panna · 750ml</div>
+            </div>
+            <div class="drink-price">₦3,000</div>
+          </div>
+          <div class="drink-qty">
+            <button onclick="adjustDrink(this,-1)">−</button>
+            <span>0</span>
+            <button onclick="adjustDrink(this,1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="drinks-total">
+        <span style="color:var(--muted)">Drinks Total</span>
+        <span style="font-family:var(--font-display);font-size:var(--xl);font-weight:700;color:var(--gold)" id="drinksTotal">₦0</span>
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">Special Requests</label>
+        <textarea class="form-input" rows="2" placeholder="Birthday celebration? Anniversary? Let us know..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="prevStep()">← Back</button>
+        <button class="btn-primary" onclick="nextStep()">Review Booking →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Confirm & Pay -->
+    <div class="step-panel" data-panel="3">
+      <h3 class="panel-title">Confirm Your <span style="color:var(--gold)">Booking</span></h3>
+      <p class="panel-sub">Review everything before we secure your reservation</p>
+
+      <div class="summary-card" id="bookingSummary">
+        <div class="summary-row"><span class="key">Date</span><span class="value" id="summaryDate">Fri, 6 Jun 2025</span></div>
+        <div class="summary-row"><span class="key">Party Size</span><span class="value" id="summaryParty">4 guests</span></div>
+        <div class="summary-row"><span class="key">Package</span><span class="value" style="color:var(--gold)" id="summaryPackage">Standard</span></div>
+        <div class="summary-row"><span class="key">Table</span><span class="value" id="summaryTable">T1 · Main Floor</span></div>
+        <div class="summary-row"><span class="key">Drinks Total</span><span class="value" id="summaryDrinks">₦0</span></div>
+        <div class="summary-row" style="border-bottom:none"><span class="key">Minimum Spend</span><span class="value" style="color:var(--gold)" id="summaryMin">₦50,000</span></div>
+      </div>
+
+      <div style="margin-top:var(--space-6)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" placeholder="Enter your full name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" placeholder="+234 800 000 0000" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="you@example.com" />
+        </div>
+      </div>
+
+      <div class="btn-row" style="flex-direction:row-reverse">
+        <button class="btn-primary" onclick="confirmBooking()" style="flex:1">Confirm & Pay →</button>
+        <button class="btn-secondary" onclick="prevStep()">← Back</button>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="success-state" id="successState">
+      <div class="check">✓</div>
+      <h2>Booking Confirmed!</h2>
+      <p style="margin-bottom:8px">Your table at Secrets Palace is secured.</p>
+      <p style="color:var(--muted);font-size:var(--sm)">A confirmation has been sent to your email.</p>
+      <p style="color:var(--gold);font-family:var(--font-display);font-size:var(--2xl);margin-top:16px" id="qrCode">♛ #SP-20250606</p>
+      <p style="color:var(--muted);font-size:var(--xs);margin-top:4px">Show this code at the door</p>
+      <div style="margin-top:24px">
+        <a href="palace-home.html" class="btn-primary" style="text-decoration:none">Back to Home</a>
+      </div>
+    </div>
+
+    <div class="space-2"></div>
+  </div>
+
+  <script>
+    var currentStep = 0;
+    var totalSteps = 4;
+    var partySize = 4;
+    var selectedTable = null;
+    var selectedPackage = 'standard';
+
+    function updateSteps() {
+      document.querySelectorAll('.step').forEach(function(el, i) {
+        el.classList.toggle('active', i === currentStep);
+        el.classList.toggle('completed', i < currentStep);
+      });
+      document.querySelectorAll('.step-connector').forEach(function(el, i) {
+        el.classList.toggle('active', i < currentStep);
+      });
+      document.querySelectorAll('.step-panel').forEach(function(el, i) {
+        el.classList.toggle('active', i === currentStep);
+      });
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps - 1) { currentStep++; updateSteps(); window.scrollTo({top:0,behavior:'smooth'}); }
+    }
+    function prevStep() {
+      if (currentStep > 0) { currentStep--; updateSteps(); window.scrollTo({top:0,behavior:'smooth'}); }
+    }
+
+    function adjustParty(delta) {
+      partySize = Math.max(1, Math.min(20, partySize + delta));
+      document.getElementById('partySize').textContent = partySize;
+    }
+
+    function selectPackage(el) {
+      document.querySelectorAll('.package-option').forEach(function(p) { p.classList.remove('selected'); });
+      el.classList.add('selected');
+      selectedPackage = el.getAttribute('data-package');
+    }
+
+    // Floor map
+    document.querySelectorAll('.table-cell.available, .table-cell.vvip.available').forEach(function(cell) {
+      cell.addEventListener('click', function() {
+        document.querySelectorAll('.table-cell.selected').forEach(function(c) { c.classList.remove('selected'); });
+        this.classList.add('selected');
+        selectedTable = this.getAttribute('data-table');
+        document.getElementById('selectedTableName').textContent = selectedTable;
+        document.getElementById('tableSummary').style.display = 'block';
+      });
+    });
+
+    // Drinks
+    function adjustDrink(btn, delta) {
+      var qtyEl = btn.parentElement.querySelector('span');
+      var qty = parseInt(qtyEl.textContent) + delta;
+      if (qty < 0) qty = 0;
+      qtyEl.textContent = qty;
+      updateDrinksTotal();
+    }
+
+    function updateDrinksTotal() {
+      var total = 0;
+      var prices = {0:85000,1:250000,2:120000,3:180000,4:12000,5:3000};
+      document.querySelectorAll('.drink-card').forEach(function(card, i) {
+        var qty = parseInt(card.querySelector('.drink-qty span').textContent);
+        total += qty * (prices[i] || 0);
+      });
+      document.getElementById('drinksTotal').textContent = '₦' + total.toLocaleString();
+    }
+
+    function filterDrinks(cat, btn) {
+      document.querySelectorAll('.category-tab').forEach(function(t) { t.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.drink-card').forEach(function(card) {
+        if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function confirmBooking() {
+      document.querySelector('.step-panel.active').style.display = 'none';
+      document.getElementById('successState').classList.add('show');
+      document.querySelector('.step-indicator').style.display = 'none';
+      // Update step indicator
+      document.querySelectorAll('.step').forEach(function(s) { s.classList.add('completed'); s.classList.remove('active'); });
+      document.querySelectorAll('.step-connector').forEach(function(c) { c.classList.add('active'); });
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  </script>
+</body>
+</html>
