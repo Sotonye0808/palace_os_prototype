@@ -1,8 +1,9 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/shared/Button';
 import { Input } from '@/components/shared/Input';
 import { Textarea } from '@/components/shared/Textarea';
-import { Select } from '@/components/shared/Select';
 import { createCMSService } from '@/lib/services/cms';
 
 type ConfigSection = 'brand' | 'menu' | 'venue' | 'loyalty' | 'notification' | 'analytics';

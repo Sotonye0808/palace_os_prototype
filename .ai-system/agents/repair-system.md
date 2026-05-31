@@ -60,6 +60,12 @@
 - Cause: `.map()` rendering without a stable unique key
 - Fix: Add `key={item.id}` — use a stable unique ID, not the array index
 
+**Missing 'use client' on Server Component Using Client Hooks**
+- Symptom: Runtime error like `useBrand must be used within a BrandProvider`, or `useAuthContext must be used within an AuthProvider`, or hooks failing silently in SSR
+- Cause: A server-component file (no 'use client') directly calls a client-side hook (`useAuth`, `useBrand`, `useState`, `useEffect`, etc.). During SSR, the hook runs but cannot find its provider context because the provider's context is not set up in the server render tree.
+- Fix: Add `'use client';` as the first line of any file that calls client-side hooks directly at the top level of a React component.
+- Prevention: Any page/layout file that imports and calls `useAuth`, `useBrand`, or any hook from a `'use client'` module must itself have `'use client'`. Also ensure that components using hooks (useState, useEffect, event handlers) have `'use client'` or are only used inside client components.
+
 ---
 
 ### Node.js / Backend
@@ -87,6 +93,32 @@
 - Prevention: Add a startup validation check that throws if required env vars are missing
 
 ---
+
+```
+## "useBrand must be used within a BrandProvider" — Server Component Using Client Hook
+
+**Symptom:**
+`Uncaught Error: useBrand must be used within a BrandProvider` at runtime when visiting admin pages.
+
+**Root Cause:**
+The admin layout (`apps/web/app/admin/layout.tsx`) and admin dashboard page (`apps/web/app/admin/dashboard/page.tsx`) were server components (no `'use client'` directive) that directly called `useAuth()` — a client-side hook. Inside `useAuth`, `useBrand()` is called via `useContext(BrandContext)`. During SSR, the server component tree renders without the BrandProvider context (which only exists in the client component tree), so `useContext` returns `null` and the guard clause throws.
+
+**Fix Applied:**
+1. Added `'use client';` to `apps/web/app/admin/layout.tsx`
+2. Added `'use client';` to `apps/web/app/admin/dashboard/page.tsx`
+3. Added `'use client';` to `apps/web/components/admin/ConfigEditor.tsx` (uses useState/useEffect)
+4. Removed unused import of `Select` from `ConfigEditor.tsx` (the file `components/shared/Select.tsx` did not exist)
+
+**Prevention:**
+Any page or layout that directly calls a client-side hook (`useAuth`, `useBrand`, `useState`, etc.) must have `'use client'` as the first line. Check all files using `useAuth` or `useBrand` for this directive.
+
+**Files Affected:**
+- apps/web/app/admin/layout.tsx
+- apps/web/app/admin/dashboard/page.tsx
+- apps/web/components/admin/ConfigEditor.tsx
+
+**Date:** 2026-05-31
+```
 
 ## Resolved Errors Archive
 

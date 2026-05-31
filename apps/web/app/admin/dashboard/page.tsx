@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/shared/Button';
 import { useBrand } from '@/lib/contexts/BrandContext';
 import { useAuth } from '@/lib/auth/hooks/useAuth';

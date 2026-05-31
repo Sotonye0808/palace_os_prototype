@@ -1,4 +1,5 @@
-// apps/web/app/(admin)/layout.tsx
+'use client';
+
 import { ReactNode } from 'react';
 import { useAuth } from '@/lib/auth/hooks/useAuth';
 import { getAccessibleAdminSections } from '@/lib/auth/roleUtils';
