@@ -7,8 +7,5 @@
   "scripts": {
     "build": "npm run build --workspace=apps/web",
     "dev": "npm run dev --workspace=apps/web"
-  },
-  "devDependencies": {
-    "turbo": "^1.10.0"
   }
 }
