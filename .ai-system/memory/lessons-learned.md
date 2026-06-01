@@ -62,7 +62,20 @@ After automated file edits or rewrites, check for literal `\n` corruption before
 
 ---
 
-## Multiple edit passes on the same file can cause structural corruption
+## Add responsive breakpoints alongside inline styles from the start
+
+**Context:**
+The palace events `[eventId]/page.tsx` was built entirely with inline styles and no media queries, making it non-responsive. When the original HTML design already had a responsive `@media` block, the Next.js port omitted it.
+
+**What We Learned:**
+When porting HTML designs with responsive breakpoints to inline-style JSX components, always include the corresponding `<style>` block with class-based media queries in the same pass. Adding responsiveness later requires adding class names to existing elements and extra `<style>` blocks, which is more work than doing it upfront.
+
+**Apply When:**
+Porting any responsive HTML design to inline-styled Next.js components — include the `<style>` tag with media queries and add className attributes to the key layout containers from the start.
+
+---
+
+## Multiple edit passes on the same file can cause structural corrosion
 
 **Context:**
 The palace/reserve/page.tsx file accumulated stray closing tags, wrong return statement nesting, and leftover fragments after 3-4 edit cycles.

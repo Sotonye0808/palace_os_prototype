@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { PalaceFooter } from '@/components/shared/PalaceFooter';
 
 const formatPrice = (p: number) => `₦${p.toLocaleString()}`;
 
@@ -36,6 +37,11 @@ export default function PalaceEventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const event = eventsData[eventId as string] || eventsData['afrobeats-friday'];
   const [quantities, setQuantities] = useState<number[]>(event.tiers.map(() => 0));
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-brand', 'secrets-palace');
+  }, []);
 
   const total = quantities.reduce((sum, qty, i) => sum + qty * event.tiers[i].price, 0);
 
@@ -51,6 +57,27 @@ export default function PalaceEventDetailPage() {
       fontFamily: "'Inter', -apple-system, system-ui, sans-serif",
       WebkitFontSmoothing: 'antialiased',
     }}>
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          background: 'rgba(8,8,16,0.98)', backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32,
+        }}>
+          <button onClick={() => setMobileMenuOpen(false)} style={{
+            position: 'absolute', top: 24, right: 24,
+            background: 'none', border: 'none', color: '#D4A017', fontSize: 32, cursor: 'pointer',
+          }}>
+            ✕
+          </button>
+          <Link href="/palace" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.25rem', color: '#FFF', textDecoration: 'none' }}>Home</Link>
+          <Link href="/palace/events" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.25rem', color: '#D4A017', textDecoration: 'none' }}>Events</Link>
+          <Link href="/palace/reserve" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.25rem', color: '#FFF', textDecoration: 'none' }}>Reserve</Link>
+          <Link href="/account-hub" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.25rem', color: '#FFF', textDecoration: 'none' }}>Account</Link>
+        </div>
+      )}
+
       {/* Navbar */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
@@ -60,13 +87,19 @@ export default function PalaceEventDetailPage() {
         backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(173,173,200,0.12)',
       }}>
-        <Link href="/palace" style={{ color: '#5F5F88', textDecoration: 'none', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Link href="/palace" className="ed-nav-back" style={{ color: '#5F5F88', textDecoration: 'none', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span>←</span>
           <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.125rem', fontWeight: 700, color: '#D4A017', letterSpacing: '0.15em' }}>SECRETS PALACE</span>
         </Link>
-        <Link href="/palace/events" style={{ color: '#5F5F88', textDecoration: 'none', fontSize: '0.875rem' }}>
+        <Link href="/palace/events" className="ed-nav-events" style={{ color: '#5F5F88', textDecoration: 'none', fontSize: '0.875rem' }}>
           All Events →
         </Link>
+        <button onClick={() => setMobileMenuOpen(true)} className="ed-hamburger" style={{
+          display: 'none', background: 'none', border: 'none', cursor: 'pointer',
+          color: '#D4A017', fontSize: 24, padding: 4,
+        }}>
+          ☰
+        </button>
       </nav>
 
       {/* Hero */}
@@ -84,7 +117,7 @@ export default function PalaceEventDetailPage() {
           position: 'absolute', inset: 0,
           background: 'linear-gradient(to top, oklch(12% 0.005 260) 0%, transparent 60%)',
         }} />
-        <div style={{ position: 'relative', zIndex: 2, padding: 40, maxWidth: 900, margin: '0 auto', width: '100%' }}>
+        <div className="ed-hero-content" style={{ position: 'relative', zIndex: 2, padding: 40, maxWidth: 900, margin: '0 auto', width: '100%' }}>
           <div style={{
             display: 'inline-block', padding: '4px 14px', borderRadius: 4,
             fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em',
@@ -106,7 +139,7 @@ export default function PalaceEventDetailPage() {
 
       {/* Detail grid */}
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px 80px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 40 }}>
+        <div className="ed-detail-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 40 }}>
           {/* Left: Description */}
           <div>
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.5rem', marginBottom: 12 }}>About This Event</h2>
@@ -205,7 +238,7 @@ export default function PalaceEventDetailPage() {
         <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.875rem', marginTop: 60, marginBottom: 12 }}>
           Related <span style={{ color: '#D4A017' }}>Events</span>
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        <div className="ed-related-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
           {event.related.map((r, i) => (
             <Link key={i} href="/palace/events/afrobeats-friday" style={{
               background: 'oklch(14% 0.008 260)',
@@ -225,22 +258,18 @@ export default function PalaceEventDetailPage() {
       </div>
 
       {/* Footer */}
-      <footer style={{
-        background: 'oklch(7% 0.004 260)',
-        borderTop: '1px solid rgba(212,160,23,0.15)',
-        padding: '40px 24px 24px',
-        textAlign: 'center',
-        color: '#5F5F88', fontSize: '0.875rem',
-      }}>
-        <p>© 2025 Secrets Palace · FoliXx Hospitality Group</p>
-        <p style={{ marginTop: 8 }}>
-          <Link href="/palace" style={{ color: '#5F5F88', textDecoration: 'none' }}>Home</Link>
-          {' · '}
-          <Link href="/palace/events" style={{ color: '#5F5F88', textDecoration: 'none' }}>Events</Link>
-          {' · '}
-          <Link href="/palace/reserve" style={{ color: '#5F5F88', textDecoration: 'none' }}>Reserve</Link>
-        </p>
-      </footer>
+      <PalaceFooter />
+
+      <style>{`
+        @media (max-width: 768px) {
+          .ed-nav-back span:last-child { display: none; }
+          .ed-nav-events { display: none !important; }
+          .ed-hamburger { display: block !important; }
+          .ed-hero-content { padding: 24px !important; }
+          .ed-detail-grid { grid-template-columns: 1fr !important; }
+          .ed-related-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

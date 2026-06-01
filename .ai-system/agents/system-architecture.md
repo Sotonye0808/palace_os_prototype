@@ -1,6 +1,6 @@
 # System Architecture
 
-> **Overview:** This document describes the actual architecture of the FoliXx Palace (PALACE_OS) platform based on code analysis. The system follows a metadata-driven, admin-configurable architecture designed to serve two distinct hospitality brands (FoliXx Bukka and Secrets Palace) from a single codebase.
+> **Overview:** This document describes the actual architecture of the PALACE_OS platform based on code analysis. The system follows a metadata-driven, admin-configurable architecture designed to serve two distinct hospitality brands (FoliXx Bukka and Secrets Palace) from a single Next.js 16 monorepo.
 
 ## Core Architectural Pattern: Metadata-First
 
@@ -87,6 +87,9 @@ apps/web/
 ├── app/
 │   ├── bukka/             # Folixx Bukka brand routes
 │   ├── palace/            # Secrets Palace brand routes
+│   │   ├── events/        # Events listing (responsive grid with filters)
+│   │   │   └── [eventId]/ # Event detail (responsive, tickets, related events)
+│   │   └── reserve/       # Table reservation with floor map
 │   ├── (account)/         # Shared account routes
 │   └── admin/             # Admin panel routes
 ├── components/
@@ -121,7 +124,7 @@ packages/
 
 ## Scalability & Performance Considerations
 
-1. **Edge Ready:** Next.js 14 App Router enables edge deployment possibilities
+1. **Edge Ready:** Next.js 16 App Router enables edge deployment possibilities
 2. **Code Splitting:** Automatic route-based and dynamic imports
 3. **Image Optimization:** Next.js Image component with Supabase Storage integration
 4. **Caching Strategy:** 

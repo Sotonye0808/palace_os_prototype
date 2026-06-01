@@ -106,3 +106,36 @@ Fixed a large wave of JSX syntax and import errors preventing `next build` from 
 - Set up proper i18n if needed for NGN currency/phone formatting
 - Address images.domains deprecation in next.config.js
 - Add proper component tests to prevent regressions
+
+## 2026-06-01  — Event detail page responsive design and mobile navigation
+
+**Summary:**
+Made the palace events `[eventId]/page.tsx` responsive with mobile-friendly views matching the pattern used in the events listing page and other palace pages.
+
+**Completed:**
+- Added mobile overlay menu with full-screen navigation overlay (Home, Events, Reserve, Account links)
+- Added hamburger button that appears on mobile (768px and below) to toggle the mobile menu
+- Added responsive breakpoints via inline `<style>` block with class-based media queries
+  - Navbar: hides "SECRETS PALACE" wordmark on mobile, hides "All Events →" link, shows hamburger
+  - Hero content: reduces padding from 40px to 24px on mobile
+  - Detail grid: switches from `2fr 1fr` to single-column layout on mobile
+  - Related events grid: switches from `repeat(3, 1fr)` to single-column layout on mobile
+- Replaced simple inline footer with shared `PalaceFooter` component for consistency
+- Added `useEffect` to set `data-brand` attribute for CSS variable resolution
+- Used `PalaceNavbar`-compatible mobile pattern (full-screen overlay with backdrop blur)
+
+**Files Modified:**
+- `apps/web/app/palace/events/[eventId]/page.tsx` — Added mobile menu, hamburger, responsive breakpoints, shared footer
+
+**Key Changes:**
+- Event detail page now properly scales down to mobile viewports
+- Mobile navigation matches the experience on other palace pages (overlay with large nav links)
+- Detail content and ticket selector stack vertically on small screens
+- Uses the same shared `PalaceFooter` component as the events listing page
+
+**Root Cause Summary:**
+The event detail page was originally built with only inline styles and no responsive media queries, making it unusable on mobile devices. Other palace pages (events listing, home) already had responsive breakpoints.
+
+**Next Sprint Focus:**
+- Check remaining palace pages for responsive gaps
+- Verify event pages on real mobile devices

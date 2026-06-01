@@ -56,57 +56,6 @@ project-root/
 │
 └── backup/                 → Backup files
 ```
-project-root/
-│
-├── src/                    → Frontend source code (Next.js 14 App Router)
-│   ├── app/                → App router pages and layouts
-│   │   ├── (buukka)/       → Bukka brand routes
-│   │   ├── (palace)/       → Secrets Palace brand routes
-│   │   ├── account/        → Shared account routes
-│   │   ├── admin/          → Admin panel routes
-│   │   └── api/            → Next.js API routes (backend endpoints)
-│   │
-│   ├── components/         → Reusable UI components
-│   │   ├── shared/         → Components used by both brands
-│   │   ├── bukka/          → Bukka-specific components
-│   │   └── palace/         → Secrets Palace-specific components
-│   │
-│   ├── features/           → Feature-based organization
-│   │   ├── shared/         → Cross-brand features (auth, loyalty, etc.)
-│   │   ├── bukka/          → Bukka features (menu, cart, orders)
-│   │   └── palace/         → Palace features (reservations, events)
-│   │
-│   ├── lib/                → Library code and utilities
-│   │   ├── config/         → Configuration system and defaults
-│   │   ├── cms/            → CMS integration services
-│   │   ├── utils/          → Utility functions
-│   │   ├── api/            → API service clients
-│   │   └── types/          → TypeScript type definitions
-│   │
-│   ├── styles/             → Global styles and CSS variables
-│   │
-│   └── public/             → Static assets
-│
-├── .ai-system/             → AI development system
-│
-├── public/                 → Static assets (images, icons, etc.)
-│
-├── tests/                  → Test suites
-│   ├── unit/               → Unit tests
-│   ├── integration/        → Integration tests
-│   └── e2e/                → End-to-end tests
-│
-├── scripts/                → Build and utility scripts
-│
-├── docs/                   → Additional documentation
-│
-├── .gitignore              → Git ignore rules
-├── package.json            → Project dependencies and scripts
-├── tsconfig.json           → TypeScript configuration
-├── next.config.js          → Next.js configuration
-├── tailwind.config.js      → Tailwind CSS configuration
-├── postcss.config.js       → PostCSS configuration
-└── README.md               → Project overview
 
 ---
 ## Directory Descriptions
