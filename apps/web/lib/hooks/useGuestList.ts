@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback } from 'react';
 import { GuestListService, GuestListEntry, GuestListFormData, UpdateRSVPData } from '@/lib/services/guestList';
 

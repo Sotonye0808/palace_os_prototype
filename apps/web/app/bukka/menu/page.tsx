@@ -1,493 +1,434 @@
-import Image from 'next/image';
+'use client';
+
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/shared/Button';
-import { useBrand } from '@/lib/contexts/BrandContext';
-import { useState } from 'react';
+import { BukkaNavbar } from '@/components/shared/BukkaNavbar';
+import { BukkaFooter } from '@/components/shared/BukkaFooter';
+import { mockMenuCategories } from '@/lib/mocks/menu';
+import type { MenuItem } from '@/lib/types/menu';
 
-import { MenuItem, MenuCategory, DietaryTag, ModifierGroup, Bundle } from '@/lib/types/menu';
+const categoryGradients: Record<string, string> = {
+  'Appetizers': 'linear-gradient(135deg,#FFE8D1,#FFC99A)',
+  'Main Courses': 'linear-gradient(135deg,#FFC99A,#FF7A2B)',
+  'Desserts': 'linear-gradient(135deg,#FFF5ED,#F5A623)',
+  'Beverages': 'linear-gradient(135deg,#FFF5ED,#FFE8D1)',
+};
 
-interface FilterState {
-  dietary: string[];
-  sort: string;
-}
-
-const mockMenuData: MenuCategory[] = [
-  {
-    id: 'appetizers',
-    name: 'Appetizers',
-    description: 'Start your meal with our delicious appetizers',
-    image: '/images/categories/appetizers.jpg',
-    items: [
-      {
-        id: 'samosa',
-        name: 'Spicy Samosa',
-        description: 'Crispy pastry filled with spiced potatoes and peas',
-        price: 500,
-        image: '/images/items/samosa.jpg',
-        category: 'appetizers',
-        isFeatured: true,
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-          { id: 'halal', label: 'Halal', value: 'halal' }
-        ],
-        modifiers: [
-          {
-            id: 'spice-level',
-            name: 'Spice Level',
-            description: 'Choose your preferred spice level',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'mild', label: 'Mild', priceAdjustment: 0, isDefault: true },
-              { id: 'medium', label: 'Medium', priceAdjustment: 50 },
-              { id: 'hot', label: 'Hot', priceAdjustment: 100 }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'spring-rolls',
-        name: 'Vegetable Spring Rolls',
-        description: 'Crispy rolls filled with fresh vegetables',
-        price: 400,
-        image: '/images/items/spring-rolls.jpg',
-        category: 'appetizers',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-          { id: 'vegan', label: 'Vegan', value: 'vegan' },
-          { id: 'gluten-free', label: 'Gluten Free', value: 'gluten-free' }
-        ],
-        modifiers: [
-          {
-            id: 'dipping-sauce',
-            name: 'Dipping Sauce',
-            description: 'Choose your dipping sauce',
-            minSelection: 0,
-            maxSelection: 2,
-            options: [
-              { id: 'sweet-chili', label: 'Sweet Chili', priceAdjustment: 0 },
-              { id: 'peanut', label: 'Peanut Sauce', priceAdjustment: 0 },
-              { id: 'soy', label: 'Soy Sauce', priceAdjustment: 0 }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'main-courses',
-    name: 'Main Courses',
-    description: 'Hearty main dishes to satisfy your hunger',
-    image: '/images/categories/main-courses.jpg',
-    items: [
-      {
-        id: 'jollof-rice',
-        name: 'Jollof Rice',
-        description: 'West African one-pot rice with tomatoes, peppers, and spices',
-        price: 1200,
-        image: '/images/items/jollof-rice.jpg',
-        category: 'main-courses',
-        isFeatured: true,
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-          { id: 'gluten-free', label: 'Gluten Free', value: 'gluten-free' }
-        ],
-        modifiers: [
-          {
-            id: 'protein',
-            name: 'Protein Addition',
-            description: 'Add protein to your jollof rice',
-            minSelection: 0,
-            maxSelection: 2,
-            options: [
-              { id: 'chicken', label: 'Grilled Chicken', priceAdjustment: 300 },
-              { id: 'beef', label: 'Stewed Beef', priceAdjustment: 350 },
-              { id: 'fish', label: 'Fried Fish', priceAdjustment: 320 },
-              { id: 'none', label: 'No Protein', priceAdjustment: 0, isDefault: true }
-            ]
-          },
-          {
-            id: 'heat-level',
-            name: 'Heat Level',
-            description: 'Choose pepper level',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'none', label: 'No Pepper', priceAdjustment: 0, isDefault: true },
-              { id: 'low', label: 'Low Pepper', priceAdjustment: 50 },
-              { id: 'medium', label: 'Medium Pepper', priceAdjustment: 100 },
-              { id: 'high', label: 'High Pepper', priceAdjustment: 150 }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'egusi-soup',
-        name: 'Egusi Soup',
-        description: 'Melon seed soup with leafy vegetables and assorted meat',
-        price: 1500,
-        image: '/images/items/egusi-soup.jpg',
-        category: 'main-courses',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'halal', label: 'Halal', value: 'halal' }
-        ],
-        modifiers: [
-          {
-            id: 'protein-type',
-            name: 'Protein Type',
-            description: 'Select your preferred protein',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'beef', label: 'Beef', priceAdjustment: 0, isDefault: true },
-              { id: 'goat', label: 'Goat', priceAdjustment: 200 },
-              { id: 'fish', label: 'Fish', priceAdjustment: 150 },
-              { id: 'chicken', label: 'Chicken', priceAdjustment: 100 }
-            ]
-          },
-          {
-            id: 'thickness',
-            name: 'Soup Thickness',
-            description: 'Choose soup consistency',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'light', label: 'Light', priceAdjustment: 0, isDefault: true },
-              { id: 'medium', label: 'Medium', priceAdjustment: 50 },
-              { id: 'thick', label: 'Thick', priceAdjustment: 100 }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'suya',
-        name: 'Spicy Suya',
-        description: 'Grilled skewered meat with peanut sauce',
-        price: 800,
-        image: '/images/items/suya.jpg',
-        category: 'main-courses',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'halal', label: 'Halal', value: 'halal' }
-        ],
-        modifiers: [
-          {
-            id: 'meat-type',
-            name: 'Meat Type',
-            description: 'Select your preferred meat',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'beef', label: 'Beef', priceAdjustment: 0, isDefault: true },
-              { id: 'chicken', label: 'Chicken', priceAdjustment: 50 },
-              { id: 'goat', label: 'Goat', priceAdjustment: 100 }
-            ]
-          },
-          {
-            id: 'spice-level',
-            name: 'Spice Level',
-            description: 'Choose spice intensity',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'mild', label: 'Mild', priceAdjustment: 0 },
-              { id: 'medium', label: 'Medium', priceAdjustment: 100, isDefault: true },
-              { id: 'hot', label: 'Hot', priceAdjustment: 200 },
-              { id: 'extra-hot', label: 'Extra Hot', priceAdjustment: 300 }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'desserts',
-    name: 'Desserts',
-    description: 'Sweet treats to end your meal',
-    image: '/images/categories/desserts.jpg',
-    items: [
-      {
-        id: 'chin-chin',
-        name: 'Chin Chin',
-        description: 'Sweet fried dough pastry',
-        price: 300,
-        image: '/images/items/chin-chin.jpg',
-        category: 'desserts',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-          { id: 'vegan', label: 'Vegan', value: 'vegan' },
-          { id: 'gluten-free', label: 'Gluten Free', value: 'gluten-free' }
-        ],
-        modifiers: [
-          {
-            id: 'serving-style',
-            name: 'Serving Style',
-            description: 'Choose how to serve',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'regular', label: 'Regular', priceAdjustment: 0, isDefault: true },
-              { id: 'with-ice-cream', label: 'With Ice Cream', priceAdjustment: 100 },
-              { id: 'with-chocolate', label: 'With Chocolate Sauce', priceAdjustment: 150 }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'ice-cream',
-        name: 'Local Ice Cream',
-        description: 'Creamy ice cream with Nigerian flavors',
-        price: 400,
-        image: '/images/items/ice-cream.jpg',
-        category: 'desserts',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' }
-        ],
-        modifiers: [
-          {
-            id: 'flavor',
-            name: 'Flavor',
-            description: 'Choose your flavor',
-            minSelection: 1,
-            maxSelection: 2,
-            options: [
-              { id: 'vanilla', label: 'Vanilla', priceAdjustment: 0, isDefault: true },
-              { id: 'chocolate', label: 'Chocolate', priceAdjustment: 50 },
-              { id: 'strawberry', label: 'Strawberry', priceAdjustment: 50 },
-              { id: 'mango', label: 'Mango', priceAdjustment: 50 },
-              { id: 'pistachio', label: 'Pistachio', priceAdjustment: 75 }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'beverages',
-    name: 'Beverages',
-    description: 'Refreshing drinks and cocktails',
-    image: '/images/categories/beverages.jpg',
-    items: [
-      {
-        id: 'zobo',
-        name: 'Zobo Drink',
-        description: 'Refreshing hibiscus drink',
-        price: 250,
-        image: '/images/items/zobo.jpg',
-        category: 'beverages',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-          { id: 'vegan', label: 'Vegan', value: 'vegan' },
-          { id: 'gluten-free', label: 'Gluten Free', value: 'gluten-free' }
-        ],
-        modifiers: [
-          {
-            id: 'sweetness',
-            name: 'Sweetness Level',
-            description: 'Choose sweetness level',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'unsweetened', label: 'Unsweetened', priceAdjustment: 0 },
-              { id: 'low', label: 'Low Sugar', priceAdjustment: 0, isDefault: true },
-              { id: 'medium', label: 'Medium Sweet', priceAdjustment: 50 },
-              { id: 'high', label: 'Highly Sweet', priceAdjustment: 100 }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'kunu',
-        name: 'Kunu Drink',
-        description: 'Millet-based refreshing drink',
-        price: 250,
-        image: '/images/items/kunu.jpg',
-        category: 'beverages',
-        isAvailable: true,
-        dietaryTags: [
-          { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-          { id: 'vegan', label: 'Vegan', value: 'vegan' },
-          { id: 'gluten-free', label: 'Gluten Free', value: 'gluten-free' }
-        ],
-        modifiers: [
-          {
-            id: 'serving-temperature',
-            name: 'Serving Temperature',
-            description: 'Choose serving temperature',
-            minSelection: 1,
-            maxSelection: 1,
-            options: [
-              { id: 'cold', label: 'Cold', priceAdjustment: 0, isDefault: true },
-              { id: 'room-temp', label: 'Room Temperature', priceAdjustment: 0 },
-              { id: 'warm', label: 'Warm', priceAdjustment: 50 }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+const itemGradients = [
+  'linear-gradient(135deg,#FFE8D1,#FFC99A)',
+  'linear-gradient(135deg,#FFF5ED,#FFE8D1)',
+  'linear-gradient(135deg,#FFE8D1,#F5A623)',
+  'linear-gradient(135deg,#FFC99A,#FF7A2B)',
+  'linear-gradient(135deg,#FFE8D1,#FFA563)',
+  'linear-gradient(135deg,#FFC99A,#E85D1A)',
+  'linear-gradient(135deg,#FFF5ED,#F5A623)',
+  'linear-gradient(135deg,#FFE8D1,#FFC99A)',
 ];
 
-export default function MenuPage() {
-  const { brandId } = useBrand();
-  
+const itemEmojis: Record<string, string> = {
+  'samosa': '🥟',
+  'spring-rolls': '🥬',
+  'jollof-rice': '🍛',
+  'egusi-soup': '🥘',
+  'suya': '🥩',
+  'chin-chin': '🍪',
+  'ice-cream': '🍦',
+  'zobo': '🥤',
+  'kunu': '🥥',
+};
+
+const dietaryOptions = ['Vegetarian', 'Vegan', 'Spicy', 'Halal', 'Gluten-Free'] as const;
+const sortOptions = ['Recommended', 'Price: Low to High', 'Price: High to Low', 'Most Popular'];
+
+const modifiers = {
+  protein: { name: 'Choose Protein', options: [
+    { label: 'Grilled Chicken', price: 0 },
+    { label: 'Fried Fish (+₦500)', price: 500 },
+    { label: 'Goat Meat (+₦800)', price: 800 },
+    { label: 'Turkey (+₦1,200)', price: 1200 },
+  ]},
+  'spice-level': { name: 'Spice Level', options: [
+    { label: 'Mild', price: 0 },
+    { label: 'Medium', price: 0 },
+    { label: 'Hot', price: 0 },
+    { label: 'Extra Hot', price: 0 },
+  ]},
+  extras: { name: 'Add Extra Sides', options: [
+    { label: 'Extra Plantain (+₦500)', price: 500 },
+    { label: 'Extra Chicken (+₦1,500)', price: 1500 },
+    { label: 'Coleslaw (+₦300)', price: 300 },
+  ]},
+};
+
+export default function BukkaMenuPage() {
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [dietaryFilters, setDietaryFilters] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('Recommended');
+  const [search, setSearch] = useState('');
+  const [drawerItem, setDrawerItem] = useState<MenuItem | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const categories = useMemo(() => {
+    return mockMenuCategories.map(c => c.name);
+  }, []);
+
+  const filteredItems = useMemo(() => {
+    let items: { item: MenuItem; category: string }[] = [];
+    for (const cat of mockMenuCategories) {
+      for (const item of cat.items) {
+        items.push({ item, category: cat.name });
+      }
+    }
+
+    if (selectedCategory !== 'all') {
+      items = items.filter(i => i.category === selectedCategory);
+    }
+
+    if (dietaryFilters.length > 0) {
+      items = items.filter(i =>
+        dietaryFilters.every(df =>
+          i.item.dietaryTags.some(t => t.label.toLowerCase() === df.toLowerCase())
+        )
+      );
+    }
+
+    if (search) {
+      const q = search.toLowerCase();
+      items = items.filter(i =>
+        i.item.name.toLowerCase().includes(q) ||
+        i.item.description.toLowerCase().includes(q)
+      );
+    }
+
+    if (sortBy === 'Price: Low to High') {
+      items.sort((a, b) => a.item.price - b.item.price);
+    } else if (sortBy === 'Price: High to Low') {
+      items.sort((a, b) => b.item.price - a.item.price);
+    } else if (sortBy === 'Most Popular') {
+      items.sort((a, b) => (b.item.isFeatured ? 1 : 0) - (a.item.isFeatured ? 1 : 0));
+    }
+
+    return items;
+  }, [selectedCategory, dietaryFilters, search, sortBy]);
+
+  const groupedItems = useMemo(() => {
+    if (selectedCategory !== 'all') {
+      const section: Record<string, typeof filteredItems> = {};
+      section[selectedCategory] = filteredItems;
+      return section;
+    }
+    const groups: Record<string, typeof filteredItems> = {};
+    const catOrder = mockMenuCategories.map(c => c.name);
+    for (const catName of catOrder) {
+      const catItems = filteredItems.filter(i => i.category === catName);
+      if (catItems.length > 0) {
+        groups[catName] = catItems;
+      }
+    }
+    return groups;
+  }, [filteredItems, selectedCategory]);
+
+  function getItemGradient(index: number): string {
+    return itemGradients[index % itemGradients.length];
+  }
+
+  function toggleDietary(label: string) {
+    setDietaryFilters(prev =>
+      prev.includes(label) ? prev.filter(d => d !== label) : [...prev, label]
+    );
+  }
+
+  function openDrawer(item: MenuItem) {
+    setDrawerItem(item);
+    setQuantity(1);
+  }
+
+  function closeDrawer() {
+    setDrawerItem(null);
+  }
+
+  const formatPrice = (p: number) => `₦${p.toLocaleString()}`;
+
   return (
-    <div className="min-h-screen bg-background text-text">
-      {/* Header */}
-      <header className="bg-bg/90 backdrop-blur-sm p-6 border-b border-border/50">
-        <div className="max-w-7xl mx-auto flex flex-col items-center">
-          <h1 className="text-4xl font-bold text-text-brand mb-2">
-            {brandId === 'folixx-bukka' ? 'Folixx Bukka Menu' : 'Secrets Palace Menu'}
-          </h1>
-          <p className="text-text-muted max-w-xl text-center">
-            Discover our authentic Nigerian cuisine with a modern twist
-          </p>
-        </div>
-      </header>
+    <div style={{ background: '#FAFAF8', minHeight: '100vh', color: '#1A1614', fontFamily: "'Inter', -apple-system, system-ui, sans-serif" }}>
+      <BukkaNavbar active="menu" />
 
-      {/* Menu Categories */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        <div className="space-y-8">
-          {mockMenuData.map((category) => (
-            <section key={category.id} className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <Image 
-                  src={category.image} 
-                  alt={category.name} 
-                  width={80} 
-                  height={80} 
-                  className="rounded-lg object-cover"
-                />
-                <div>
-                  <h2 className="text-2xl font-semibold text-text">
-                    {category.name}
-                  </h2>
-                  <p className="text-text-muted">
-                    {category.description}
-                  </p>
-                </div>
-              </div>
-              
-              {/* Menu Items Grid */}
-              <div className="grid gap-6">
-                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {category.items.map((item) => (
-                    <Link 
-                      key={item.id} 
-                      href={`/bukka/menu/${item.id}`}
-                      className="group"
-                    >
-                      <div className="bg-card rounded-xl border border-border/50 hover:border-border/70 hover:shadow-lg transition-all flex flex-col h-full">
-                        {item.isFeatured && (
-                          <div className="absolute -top-2 -left-2 bg-primary/20 text-text-primary px-2 py-0.5 text-xs rounded">
-                            Featured
-                          </div>
-                        )}
-                        
-                        <div className="relative aspect-w-4 aspect-h-3 overflow-hidden rounded-t-lg">
-                          <Image 
-                            src={item.image} 
-                            alt={item.name} 
-                            fill 
-                            className="object-cover transition-transform duration-300 group-hover:scale-105" 
-                          />
-                          {!item.isAvailable && (
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                              <span className="text-text-inverse text-sm">Unavailable</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex-1 px-4 py-4 flex flex-col">
-                          <h3 className="text-lg font-medium text-text line-clamp-2">
-                            {item.name}
-                          </h3>
-                          <p className="mt-2 text-text-sm text-text-muted line-clamp-3 flex-1">
-                            {item.description}
-                          </p>
-                          <div className="mt-4 flex items-baseline space-x-2">
-                            <span className="font-semibold text-text">&#8358;{item.price.toLocaleString()}</span>
-                            <Button variant="primary" size="sm" className="ml-auto" disabled={!item.isAvailable}>
-                              Add to Cart
-                            </Button>
-                          </div>
-                        </div>
+      <div style={{ paddingTop: 80, display: 'flex' }}>
+        {/* Sidebar */}
+        <aside className="menu-sidebar" style={{
+          width: 260, flexShrink: 0,
+          padding: 24, borderRight: '1px solid #E8E4DD',
+          position: 'sticky', top: 80, height: 'calc(100vh - 80px)', overflowY: 'auto',
+          background: '#FFFFFF'
+        }}>
+          <div style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#7A706A', marginBottom: 12 }}>Categories</h3>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', cursor: 'pointer', fontSize: '0.875rem', color: selectedCategory === 'all' ? '#1A1614' : '#7A706A' }}>
+              <input type="radio" name="category" checked={selectedCategory === 'all'} onChange={() => setSelectedCategory('all')} style={{ accentColor: '#E85D1A' }} /> All Items
+            </label>
+            {categories.map(cat => (
+              <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', cursor: 'pointer', fontSize: '0.875rem', color: selectedCategory === cat ? '#1A1614' : '#7A706A' }}>
+                <input type="radio" name="category" checked={selectedCategory === cat} onChange={() => setSelectedCategory(cat)} style={{ accentColor: '#E85D1A' }} /> {cat}
+              </label>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#7A706A', marginBottom: 12 }}>Dietary</h3>
+            {dietaryOptions.map(d => (
+              <label key={d} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', cursor: 'pointer', fontSize: '0.875rem', color: dietaryFilters.includes(d) ? '#1A1614' : '#7A706A' }}>
+                <input type="checkbox" checked={dietaryFilters.includes(d)} onChange={() => toggleDietary(d)} style={{ accentColor: '#E85D1A' }} /> {d}
+              </label>
+            ))}
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#7A706A', marginBottom: 12 }}>Sort By</h3>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{
+              width: '100%', padding: 8, border: '1px solid #E8E4DD', borderRadius: 8,
+              background: '#FFFFFF', fontSize: '0.875rem', color: '#1A1614',
+              fontFamily: "'Inter', -apple-system, system-ui, sans-serif"
+            }}>
+              {sortOptions.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        </aside>
+
+        {/* Main content */}
+        <div className="menu-main-content" style={{ flex: 1, maxWidth: 'calc(100% - 260px)', padding: 24 }}>
+          {/* Mobile sidebar toggle */}
+          <button className="menu-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} style={{
+            display: 'none', padding: '10px 20px', background: '#E85D1A', color: '#fff',
+            border: 'none', borderRadius: 9999, fontSize: '0.875rem', fontWeight: 600,
+            cursor: 'pointer', marginBottom: 12, width: '100%'
+          }}>
+            ☰ Filters
+          </button>
+
+          {/* Search bar */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '12px 16px', background: '#FFFFFF',
+            border: '1px solid #E8E4DD', borderRadius: 9999, marginBottom: 16
+          }}>
+            <span>🔍</span>
+            <input
+              type="text"
+              placeholder="Search menu items..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{
+                flex: 1, border: 'none', background: 'transparent',
+                fontSize: '0.875rem', color: '#1A1614', outline: 'none',
+                fontFamily: "'Inter', -apple-system, system-ui, sans-serif"
+              }}
+            />
+            {search && (
+              <button onClick={() => setSearch('')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.875rem', color: '#7A706A' }}>✕</button>
+            )}
+          </div>
+
+          {/* Active filters */}
+          {(selectedCategory !== 'all' || dietaryFilters.length > 0) && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+              {selectedCategory !== 'all' && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FFF5ED', borderRadius: 9999, fontSize: 11, color: '#E85D1A', fontWeight: 500 }}>
+                  {selectedCategory}
+                  <span onClick={() => setSelectedCategory('all')} style={{ cursor: 'pointer', fontSize: 14, marginLeft: 4 }}>✕</span>
+                </span>
+              )}
+              {dietaryFilters.map(d => (
+                <span key={d} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FFF5ED', borderRadius: 9999, fontSize: 11, color: '#E85D1A', fontWeight: 500 }}>
+                  {d}
+                  <span onClick={() => toggleDietary(d)} style={{ cursor: 'pointer', fontSize: 14, marginLeft: 4 }}>✕</span>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Menu sections */}
+          {Object.entries(groupedItems).map(([sectionName, items]) => (
+            <div key={sectionName} style={{ marginBottom: 32 }}>
+              <h2 style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontSize: '1.25rem', color: '#E85D1A', marginBottom: 12, marginTop: 24
+              }}>
+                {sectionName} <span style={{ color: '#7A706A', fontFamily: "'Inter', -apple-system, system-ui, sans-serif", fontSize: '0.875rem', fontWeight: 400 }}>({items.length} items)</span>
+              </h2>
+              <div className="menu-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+                {items.map(({ item, category }, idx) => (
+                  <div
+                    key={item.id}
+                    onClick={() => openDrawer(item)}
+                    style={{
+                      background: '#FFFFFF', border: '1px solid #E8E4DD',
+                      borderRadius: 16, overflow: 'hidden',
+                      transition: 'all 0.3s', cursor: 'pointer'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(232,93,26,0.08)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
+                  >
+                    <div style={{
+                      aspectRatio: '16/9', position: 'relative',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'
+                    }}>
+                      <div style={{ position: 'absolute', inset: 0, background: getItemGradient(idx) }} />
+                      {item.isFeatured && (
+                        <span style={{
+                          position: 'absolute', top: 8, left: 8,
+                          padding: '2px 10px', borderRadius: 4,
+                          fontSize: 9, fontWeight: 600, textTransform: 'uppercase',
+                          background: '#E85D1A', color: '#fff'
+                        }}>
+                          {item.id === 'jollof-rice' ? '★ Bestseller' : 'Popular'}
+                        </span>
+                      )}
+                      <span style={{ fontSize: 32, zIndex: 1 }}>{itemEmojis[item.id] || '🍽️'}</span>
+                    </div>
+                    <div style={{ padding: 14 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{item.name}</span>
+                        <span style={{ color: '#E85D1A', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.875rem' }}>{formatPrice(item.price)}</span>
                       </div>
-                    </Link>
-                  ))}
-                </div>
+                      <p style={{ color: '#7A706A', fontSize: '0.75rem', marginTop: 2, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {item.description}
+                      </p>
+                      <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+                        {item.dietaryTags.map(tag => (
+                          <span key={tag.id} style={{ padding: '1px 6px', fontSize: 9, borderRadius: 3, background: '#FFF5ED', color: '#E85D1A' }}>{tag.label}</span>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                        <button
+                          onClick={e => { e.stopPropagation(); openDrawer(item); }}
+                          style={{
+                            padding: '6px 16px', background: '#E85D1A', color: '#fff',
+                            border: 'none', borderRadius: 9999, fontSize: 11,
+                            fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = '#C44510'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = '#E85D1A'; }}
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </section>
+            </div>
           ))}
-        </div>
-      </main>
 
-      {/* Footer Call to Action */}
-      <footer className="bg-bg/50 backdrop-blur-sm p-8 border-t border-border/50">
-        <div className="max-w-7xl mx-auto text-center">
-          <h3 className="text-2xl font-semibold mb-4">
-            Ready to order?
-          </h3>
-          <p className="text-text-muted mb-6 max-w-2xl mx-auto">
-            Our menu features authentic Nigerian dishes made with fresh, locally-sourced ingredients.
-          </p>
-          <Link href="/bukka/cart">
-            <Button variant="primary" size="lg">
-              View Cart
-            </Button>
-          </Link>
+          {filteredItems.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#7A706A' }}>
+              <p style={{ fontSize: '1.125rem' }}>No menu items found</p>
+              <p style={{ fontSize: '0.875rem', marginTop: 8 }}>Try adjusting your filters or search</p>
+            </div>
+          )}
         </div>
-      </footer>
+      </div>
+
+      {/* Item detail drawer */}
+      {drawerItem && (
+        <>
+          <div
+            onClick={closeDrawer}
+            style={{
+              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+              zIndex: 200, animation: 'fadeIn 0.2s ease'
+            }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201,
+            background: '#FFFFFF', borderRadius: '20px 20px 0 0',
+            maxHeight: '85vh', overflowY: 'auto', padding: 0,
+            animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1)'
+          }}>
+            <div style={{ width: 40, height: 4, background: '#E8E4DD', borderRadius: 2, margin: '12px auto' }} />
+            <div style={{
+              width: '100%', aspectRatio: '16/7',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: getItemGradient(0), position: 'relative'
+            }}>
+              <span style={{ fontSize: 64 }}>{itemEmojis[drawerItem.id] || '🍽️'}</span>
+            </div>
+            <div style={{ padding: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div>
+                  <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.5rem' }}>{drawerItem.name}</h2>
+                </div>
+                <span style={{ color: '#E85D1A', fontWeight: 700, fontSize: '1.25rem', fontFamily: "'JetBrains Mono', monospace" }}>{formatPrice(drawerItem.price)}</span>
+              </div>
+              <p style={{ color: '#7A706A', lineHeight: 1.7, margin: '8px 0 16px' }}>{drawerItem.description}</p>
+
+              {/* Modifier groups */}
+              <div style={{ marginBottom: 16 }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: 8 }}>Choose Protein</h4>
+                {modifiers.protein.options.map((opt, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: '0.875rem', color: '#7A706A' }}>
+                    <input type="radio" name="protein" defaultChecked={i === 0} style={{ accentColor: '#E85D1A' }} /> {opt.label}
+                  </label>
+                ))}
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: 8 }}>Spice Level</h4>
+                {modifiers['spice-level'].options.map((opt, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: '0.875rem', color: '#7A706A' }}>
+                    <input type="radio" name="spice" defaultChecked={i === 1} style={{ accentColor: '#E85D1A' }} /> {opt.label}
+                  </label>
+                ))}
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: 8 }}>Add Extra Sides</h4>
+                {modifiers.extras.options.map((opt, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: '0.875rem', color: '#7A706A' }}>
+                    <input type="checkbox" style={{ accentColor: '#E85D1A' }} /> {opt.label}
+                  </label>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, border: '1px solid #E8E4DD', borderRadius: 9999, padding: '8px 16px' }}>
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#7A706A' }}>−</button>
+                  <span style={{ fontWeight: 700, minWidth: 20, textAlign: 'center' }}>{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} style={{ border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#E85D1A' }}>+</button>
+                </div>
+                <button
+                  onClick={closeDrawer}
+                  style={{
+                    flex: 1, padding: 14, background: '#E85D1A', color: '#fff',
+                    border: 'none', borderRadius: 9999, fontWeight: 600, cursor: 'pointer'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#C44510'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#E85D1A'; }}
+                >
+                  Add to Cart — {formatPrice(drawerItem.price * quantity)}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      <BukkaFooter />
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @media (max-width: 1024px) {
+          .menu-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
+        @media (max-width: 768px) {
+          .menu-sidebar { display: none !important; }
+          .menu-sidebar-toggle { display: block !important; }
+          .menu-main-content { max-width: 100% !important; padding: 16px !important; }
+          .menu-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .menu-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
-}
-
-const mockBundles: Bundle[] = [
-  {
-    id: 'family-feast',
-    name: 'Family Feast Bundle',
-    description: 'Enough food for the whole family - 2 mains, 4 sides, and 2 drinks',
-    price: 5500,
-    items: [
-      { menuItemId: 'jollof-rice', quantity: 2 },
-      { menuItemId: 'egusi-soup', quantity: 2 },
-      { menuItemId: 'fried-plantains', quantity: 4 },
-      { menuItemId: 'zobo', quantity: 2 }
-    ]
-  },
-  {
-    id: 'date-night',
-    name: 'Date Night Special',
-    description: 'Romantic dinner for two with dessert and drinks',
-    price: 4200,
-    items: [
-      { menuItemId: 'suya', quantity: 2 },
-      { menuItemId: 'egusi-soup', quantity: 2 },
-      { menuItemId: 'chin-chin', quantity: 2 },
-      { menuItemId: 'kunu', quantity: 2 }
-    ]
-  },
-  {
-    id: 'lunch-combo',
-    name: 'Quick Lunch Combo',
-    description: 'Main dish, side, and drink for a quick lunch',
-    price: 1800,
-    items: [
-      { menuItemId: 'jollof-rice', quantity: 1 },
-      { menuItemId: 'samosa', quantity: 2 },
-      { menuItemId: 'zobo', quantity: 1 }
-    ]
-  }
-];
-
-function calculateBundleSavings(bundle: Bundle): number {
-  return Math.round(bundle.price * 0.2);
 }

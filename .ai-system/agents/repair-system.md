@@ -118,7 +118,93 @@ Any page or layout that directly calls a client-side hook (`useAuth`, `useBrand`
 - apps/web/components/admin/ConfigEditor.tsx
 
 **Date:** 2026-05-31
+
 ```
+## "useBrand must be used within a BrandProvider" — AuthProvider Outside BrandProvider
+
+**Symptom:**
+`Uncaught Error: useBrand must be used within a BrandProvider` at runtime in root layout, stack trace showing `useBrand → useAuth → AuthProvider → RootLayout`.
+
+**Root Cause:**
+`AuthProvider` (which calls `useAuth()` → `useBrand()`) was nested INSIDE `BrandProvider` as a sibling/child, but `useBrand()` is called during `AuthProvider`'s render before `BrandProvider` context is available. React context only flows **down** the tree, not up. So `AuthProvider` could not access `BrandContext` which was rendered as its child.
+
+```tsx
+<AuthProvider>          ← useAuth() → useBrand() → useContext(BrandContext) → null!
+  <BrandProvider>       ← context not available yet
+```
+
+**Fix Applied:**
+Swapped the nesting order in `apps/web/app/layout.tsx` so `BrandProvider` wraps `AuthProvider`:
+
+```tsx
+<BrandProvider>
+  <AuthProvider>        ← useBrand() can now find BrandContext
+```
+
+**Prevention:**
+When a provider (A) internally uses context from another provider (B), provider B must wrap provider A in the component tree — React context only flows downward.
+
+**Files Affected:**
+- apps/web/app/layout.tsx
+
+**Date:** 2026-05-31
+
+```
+## "Missing 'use client' on Page Using usePathname/useRouter/useSearchParams/useBrand"
+
+**Symptom:**
+Dev server runtime error: `You're importing a module that depends on usePathname into a React Server Component module. This API is only available in Client Components.`
+
+**Root Cause:**
+Multiple page files were server components (no `'use client'`) that imported and used client-side hooks (`usePathname`, `useRouter`, `useSearchParams`, `useState`, `useBrand`, `useAuth`, `useOrderStore`, etc.).
+
+**Files Fixed:**
+- apps/web/app/bukka/menu/page.tsx — added 'use client'
+- apps/web/app/palace/events/page.tsx — added 'use client'
+- apps/web/app/bukka/order-tracking/page.tsx — added 'use client'
+
+**Prevention:**
+Any page/layout that imports `next/navigation` hooks (`usePathname`, `useRouter`, `useSearchParams`), React hooks (`useState`, `useEffect`, `useCallback`), or context hooks (`useBrand`, `useAuth`) must have `'use client'`.
+
+---
+
+```
+## "Wrong Import: `import { Image } from 'next/image'` should be `import Image from 'next/image'`"
+
+**Symptom:**
+Runtime error when visiting `/palace/events`: `Image is not exported from next/image` (named import, but Image is a default export).
+
+**Root Cause:**
+`palace/events/page.tsx` used `import { Image } from 'next/image'` with curly braces (named import), but `Image` is the default export from `next/image`.
+
+**File Fixed:**
+- apps/web/app/palace/events/page.tsx — changed to `import Image from 'next/image'`
+
+**Prevention:**
+`next/image` exports `Image` as a default export, not a named export. Always use `import Image from 'next/image'`.
+
+---
+
+```
+## "Missing 'use client' on Custom Hook Files"
+
+**Symptom:**
+Potential runtime errors when hook files (using `useState`, `useCallback`, etc.) are imported by server components or during edge cases in SSR.
+
+**Root Cause:**
+Custom hook files in `lib/hooks/` and `lib/payments/hooks/` used React hooks without `'use client'`. While they work when consumed by `'use client'` pages (bundled into client module graph), they could break if imported by server components.
+
+**Files Fixed (added 'use client'):**
+- apps/web/lib/hooks/useWaitlist.ts
+- apps/web/lib/hooks/useGuestList.ts
+- apps/web/lib/hooks/useReferral.ts
+- apps/web/lib/hooks/useNotification.ts
+- apps/web/lib/payments/hooks/usePaystack.ts
+
+**Prevention:**
+All custom hooks that use React hooks (`useState`, `useEffect`, `useCallback`, `useContext`, etc.) should have `'use client'` for defensive programming.
+
+---
 
 ## Resolved Errors Archive
 

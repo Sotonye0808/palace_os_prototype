@@ -1,115 +1,39 @@
 'use client';
 
 import { Image } from 'next/image';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useParams } from 'next/navigation';
 import { Button } from '@/components/shared/Button';
 import { useBrand } from '@/lib/contexts/BrandContext';
 import { useCartStore } from '@/lib/stores/cart';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { MenuItem, ModifierGroup, DietaryTag } from '@/lib/types/menu';
 import { getMenuItemJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/shared/seo/JsonLd';
 
-// Mock menu data - in a real app, this would come from config/system
-const mockMenuItems: Record<string, MenuItem> = {
-  'samosa': {
-    id: 'samosa',
-    name: 'Spicy Samosa',
-    description: 'Crispy pastry filled with spiced potatoes and peas',
-    price: 500,
-    image: '/images/items/samosa.jpg',
-    category: 'appetizers',
-    isFeatured: true,
-    isAvailable: true,
-    dietaryTags: [
-      { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-      { id: 'halal', label: 'Halal', value: 'halal' }
-    ],
-    modifiers: [
-      {
-        id: 'spice-level',
-        name: 'Spice Level',
-        description: 'Choose your preferred spice level',
-        minSelection: 1,
-        maxSelection: 1,
-        options: [
-          { id: 'mild', label: 'Mild', priceAdjustment: 0, isDefault: true },
-          { id: 'medium', label: 'Medium', priceAdjustment: 50 },
-          { id: 'hot', label: 'Hot', priceAdjustment: 100 }
-        ]
-      },
-      {
-        id: 'serving-size',
-        name: 'Serving Size',
-        description: 'Select serving size',
-        minSelection: 1,
-        maxSelection: 1,
-        options: [
-          { id: 'regular', label: 'Regular (2 pcs)', priceAdjustment: 0, isDefault: true },
-          { id: 'large', label: 'Large (4 pcs)', priceAdjustment: 200 }
-        ]
-      }
-    ]
-  },
-  'jollof-rice': {
-    id: 'jollof-rice',
-    name: 'Jollof Rice',
-    description: 'West African one-pot rice with tomatoes, peppers, and spices',
-    price: 1200,
-    image: '/images/items/jollof-rice.jpg',
-    category: 'main-courses',
-    isFeatured: true,
-    isAvailable: true,
-    dietaryTags: [
-      { id: 'vegetarian', label: 'Vegetarian', value: 'vegetarian' },
-      { id: 'gluten-free', label: 'Gluten Free', value: 'gluten-free' }
-    ],
-    modifiers: [
-      {
-        id: 'protein',
-        name: 'Protein Addition',
-        description: 'Add protein to your jollof rice',
-        minSelection: 0,
-        maxSelection: 2,
-        options: [
-          { id: 'chicken', label: 'Grilled Chicken', priceAdjustment: 300 },
-          { id: 'beef', label: 'Stewed Beef', priceAdjustment: 350 },
-          { id: 'fish', label: 'Fried Fish', priceAdjustment: 320 },
-          { id: 'none', label: 'No Protein', priceAdjustment: 0, isDefault: true }
-        ]
-      },
-      {
-        id: 'heat-level',
-        name: 'Heat Level',
-        description: 'Choose pepper level',
-        minSelection: 1,
-        maxSelection: 1,
-        options: [
-          { id: 'none', label: 'No Pepper', priceAdjustment: 0, isDefault: true },
-          { id: 'low', label: 'Low Pepper', priceAdjustment: 50 },
-          { id: 'medium', label: 'Medium Pepper', priceAdjustment: 100 },
-          { id: 'high', label: 'High Pepper', priceAdjustment: 150 }
-        ]
-      }
-    ]
-  }
-  // Additional items would be defined similarly
-};
+import { getMockMenuItemsRecord } from '@/lib/mocks/menu';
 
-export default function MenuItemDetailPage({ params }: { params: { itemId: string } }) {
+// Mock menu data - in a real app, this would come from config/system
+const mockMenuItems: Record<string, MenuItem> = getMockMenuItemsRecord();
+
+export default function MenuItemDetailPage() {
   const { brandId } = useBrand();
   const router = useRouter();
   const pathname = usePathname();
   const { addItem } = useCartStore();
-  const itemId = params.itemId;
+  const params = useParams();
+  const itemId = params.itemId as string;
   
   // Get item from mock data (would come from config in real app)
   const item = mockMenuItems[itemId];
   
+  useEffect(() => {
+    if (!item) {
+      router.push('/bukka/menu');
+    }
+  }, [item, router]);
+  
   if (!item) {
-    // Handle missing item - redirect to menu or show 404
-    router.push('/menu');
     return null;
   }
   
@@ -118,7 +42,7 @@ export default function MenuItemDetailPage({ params }: { params: { itemId: strin
     name: item.name,
     description: item.description,
     image: item.image,
-    price: item.basePrice,
+    price: item.price,
     category: item.category,
     brand: brandId as 'folixx-bukka' | 'secrets-palace',
   });
@@ -146,7 +70,7 @@ export default function MenuItemDetailPage({ params }: { params: { itemId: strin
   
   // Calculate total price with modifiers
   const calculateTotalPrice = () => {
-    let total = item.basePrice;
+    let total = item.price;
     
     Object.entries(selectedModifiers).forEach(([groupId, selectedOptionIds]) => {
       const group = item.modifiers.find(g => g.id === groupId);
@@ -183,7 +107,7 @@ export default function MenuItemDetailPage({ params }: { params: { itemId: strin
     addItem({
       menuItemId: item.id,
       name: item.name,
-      basePrice: item.basePrice,
+      basePrice: item.price,
       image: item.image,
       selectedModifiers,
       dietaryTags: item.dietaryTags
@@ -245,7 +169,7 @@ export default function MenuItemDetailPage({ params }: { params: { itemId: strin
         <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
           
           {/* Image */}
-          <div className="relative aspect-w-4 aspect-h-3">
+          <div className="relative aspect-[4/3]">
             <Image 
               src={item.image} 
               alt={item.name} 
@@ -268,7 +192,7 @@ export default function MenuItemDetailPage({ params }: { params: { itemId: strin
             
             {/* Price */}
             <div className="text-3xl font-bold text-text">
-              ?{item.basePrice.toLocaleString()}
+              ?{item.price.toLocaleString()}
             </div>
             
             {/* Dietary Tags */}
@@ -428,7 +352,7 @@ export default function MenuItemDetailPage({ params }: { params: { itemId: strin
           <Button
             variant="secondary"
             size="lg"
-            href="/menu"
+            href="/bukka/menu"
           >
             Browse More Menu Items
           </Button>

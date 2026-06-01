@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback } from 'react';
 import { WaitlistService, WaitlistEntry, WaitlistFormData } from '@/lib/services/waitlist';
 

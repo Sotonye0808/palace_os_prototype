@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback } from 'react';
 import { createNotificationService, NotificationService } from '@/lib/services/notification';
 

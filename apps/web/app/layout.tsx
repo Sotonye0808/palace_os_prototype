@@ -1,13 +1,10 @@
 import '../styles/globals.css';
 import '@/styles/accessibility.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import { BrandProvider } from '@/lib/contexts/BrandContext';
 import { AuthProvider } from '@/lib/contexts/AuthContext';
 import { getOrganizationJsonLd, getWebSiteJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/shared/seo/JsonLd';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const dynamic = 'force-dynamic';
 
@@ -25,18 +22,18 @@ export default function RootLayout({
   const webSiteJsonLd = getWebSiteJsonLd();
 
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <body>
-        <AuthProvider>
-          <BrandProvider defaultBrandId="folixx-bukka">
+        <BrandProvider defaultBrandId="folixx-bukka">
+          <AuthProvider>
             <a href="#main-content" className="skip-link">
               Skip to main content
             </a>
             <JsonLd jsonLd={organizationJsonLd} />
             <JsonLd jsonLd={webSiteJsonLd} />
             {children}
-          </BrandProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </BrandProvider>
       </body>
     </html>
   );

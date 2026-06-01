@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback } from 'react';
 import { ReferralService, Referral, ReferralFormData } from '@/lib/services/referral';
 
